@@ -38,7 +38,9 @@ These files must now be compiled.
 * create a folder named "*kdtree*" in the directory "*...\ILAND-master\utilities\...*" 
 * configure the [MEX environment](https://de.mathworks.com/help/matlab/matlab_external/what-you-need-to-build-mex-files.html)
 * download and install a Matlab-supported C++ compiler
+
 The following description is for Windows machines:
+
 * type "*mex -setup C++*" in Matlab's command window to setup the mex environment
 * open "...\ILAND-master\utilities\ataiya_kdtree\..." in Matlab's current folder panel
 * type *mex kdtree_build*" in Matlab's command window
