@@ -53,7 +53,7 @@ ILAND can be used via the command window or by opening the user interface. To op
 
 ## License
 
-ILAND is licensed under the GNU GPL - see the [License.md](LICENSE) file for details. ILAND includes [multiWaitbar](https://de.mathworks.com/matlabcentral/fileexchange/26589-multiwaitbar-label-varargin), which comes with a separate license.
+ILAND is licensed under the GNU GPL - see the [LICENSE](LICENSE) file for details. ILAND includes [multiWaitbar](https://de.mathworks.com/matlabcentral/fileexchange/26589-multiwaitbar-label-varargin), which comes with a separate license.
 
 ## Notes
 
