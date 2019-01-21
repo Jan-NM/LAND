@@ -43,7 +43,7 @@ The following description is for Windows machines:
 
 * type "*mex -setup C++*" in Matlab's command window to setup the mex environment
 * open "...\ILAND-master\utilities\ataiya_kdtree\..." in Matlab's current folder panel
-* type *mex kdtree_build*" in Matlab's command window
+* type "*mex kdtree_build*" in Matlab's command window
 * type "*mex kdtree_ball_query*" in Matlab's command window
 * type "*mex kdtree_delete*" in Matlab's command window
 
