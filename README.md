@@ -22,7 +22,7 @@ At least 8 GByte RAM are recommended.
 
 * download the software package from https://github.com/Jan-NM/ILAND
 * extract **ILAND-master.zip**
-* copy the generated **ILAND-master** directory into your local Matlab working directory (on Windows machines, usually C:\Users\*user name*\Documents\MATLAB)
+* copy the generated **ILAND-master** directory into your local Matlab working directory (on Windows machines, usually C:\Users\ *user name*\Documents\MATLAB)
 
 To use Andrea Tagliasacchi's kdtree, download the following files from https://github.com/ataiya/kdtree/tree/master/toolbox:
 * KDTree.h
