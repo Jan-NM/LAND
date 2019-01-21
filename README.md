@@ -22,7 +22,7 @@ At least 8 GByte RAM are recommended.
 
 * download the software package from https://github.com/Jan-NM/ILAND
 * extract **ILAND-master.zip**
-* copy the generated **ILAND-master** directory into your local Matlab working directory (on Windows machines, usually C:\Users\\*user name*\Documents\MATLAB)
+* copy the generated **ILAND-master** directory into your local Matlab working directory (on Windows machines, usually C:\Users\"user name"\Documents\MATLAB)
 
 To use Andrea Tagliasacchi's kdtree, download the following files from https://github.com/ataiya/kdtree/tree/master/toolbox:
 * KDTree.h
@@ -35,19 +35,19 @@ To use Andrea Tagliasacchi's kdtree, download the following files from https://g
 * MyHeaps.h
 
 These files must now be compiled.
-* create a folder named *kdtree* in the directory *...\ILAND-master\utilities\...** 
+* create a folder named "*kdtree*" in the directory "*...\ILAND-master\utilities\...*" 
 * configure the [MEX environment](https://de.mathworks.com/help/matlab/matlab_external/what-you-need-to-build-mex-files.html)
 * download and install a Matlab-supported C++ compiler
 The following description is for Windows machines:
-* type *mex -setup C++* in Matlab's command window to setup the mex environment
-* open **...\ILAND-master\utilities\ataiya_kdtree\...** in Matlab's current folder panel
-* type *mex kdtree_build* in Matlab's command window
-* type *mex kdtree_ball_query* in Matlab's command window
-* type *mex kdtree_delete* in Matlab's command window
+* type "*mex -setup C++*" in Matlab's command window to setup the mex environment
+* open "...\ILAND-master\utilities\ataiya_kdtree\..." in Matlab's current folder panel
+* type *mex kdtree_build*" in Matlab's command window
+* type "*mex kdtree_ball_query*" in Matlab's command window
+* type "*mex kdtree_delete*" in Matlab's command window
 
-* to use ILAND, right click on ILAND-master in Matlab's current folder panel, go to *Add to Path* and click on *Selected Folders and Subfolders*
+* to use ILAND, right click on ILAND-master in Matlab's current folder panel, go to "*Add to Path*" and click on "*Selected Folders and Subfolders*"
 
-ILAND can be used via the command window or by opening the user interface. To open the user interface type *startClusterAnalysis* in the command window. Detailed instructions on how to use the software including examples can be found in the manual [ILAND_manual.pdf](ILAND_manual.pdf).
+ILAND can be used via the command window or by opening the user interface. To open the user interface type "*startClusterAnalysis*" in the command window. Detailed instructions on how to use the software including examples can be found in the manual [ILAND_manual.pdf](ILAND_manual.pdf).
 
 ## License
 
