@@ -43,9 +43,9 @@ The following description is for Windows machines:
 
 * type "*mex -setup C++*" in Matlab's command window to setup the mex environment
 * open "...\LAND-master\utilities\ataiya_kdtree\..." in Matlab's current folder panel
-* type "*mex kdtree_build*" in Matlab's command window
-* type "*mex kdtree_ball_query*" in Matlab's command window
-* type "*mex kdtree_delete*" in Matlab's command window
+* type "*mex kdtree_build.cpp*" in Matlab's command window
+* type "*mex kdtree_ball_query.cpp*" in Matlab's command window
+* type "*mex kdtree_delete.cpp*" in Matlab's command window
 
 * to use LAND, right click on ILAND-master in Matlab's current folder panel, go to "*Add to Path*" and click on "*Selected Folders and Subfolders*"
 
