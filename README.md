@@ -20,7 +20,7 @@ At least 8 GByte RAM are recommended.
 
 ### Installing
 
-* download the software package from https://github.com/Jan-NM/ILAND
+* download the software package from https://github.com/Jan-NM/LAND
 * extract **LAND-master.zip**
 * copy the generated **LAND-master** directory into your local Matlab working directory (on Windows machines, usually C:\Users\ "user name"\Documents\MATLAB)
 
