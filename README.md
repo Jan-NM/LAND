@@ -1,6 +1,6 @@
-# Localization Analyzer for Nanoscale Distributions (ILAND)
+# Localization Analyzer for Nanoscale Distributions (LAND)
 
-LAND is a software package for Matlab that enables quantitative 2D and 3D analysis of single molecule localization microscopy (SMLM) data. The package includes density-based clustering algorithms like DBSCAN and algorithms used in spatial statistics like the radial density function or Ripley's function. In addition, it contains algorithms for quantifying the conformation and texture of the nuclear nanostructure. ILAND has been specifically designed for the evaluation of large sample sizes and data with high emitter densities.
+LAND is a software package for Matlab that enables quantitative 2D and 3D analysis of single molecule localization microscopy (SMLM) data. The package includes density-based clustering algorithms like DBSCAN and algorithms used in spatial statistics like the radial density function or Ripley's function. In addition, it contains algorithms for quantifying the conformation and texture of the nuclear nanostructure. LAND has been specifically designed for the evaluation of large sample sizes and data with high emitter densities.
 
 ## Getting Started
 
