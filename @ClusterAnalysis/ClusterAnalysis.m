@@ -4,9 +4,9 @@ classdef ClusterAnalysis < handle
 % Class constructor extracts positions and localization precision of SMLM
 % data and creates automatically a random position table. Input
 % localization table should be in Orte file format i.e. 
-% column 2/3 = x/y-position, column 3/5 = x/y-localization precision,
+% column 2/3/11 = x/y/z-position, column 4/5/12 = x/y/z-localization precision,
 % column 9 = frame number
-% If your localization table does not contain the x- and y-localization
+% If your localization table does not contain the x-, y- or z localization
 % precisions, a warning will be displayed. One option to avoid possible
 % errors due to missing localization precisions could be to use an average
 % localization precision as calculated by nearest neighbor based analysis
@@ -17,18 +17,25 @@ classdef ClusterAnalysis < handle
 %
 % To create an instance of this class call:
 %
-%   e.g. cell01 = ClusterAnalysis(localization data, varargin);
+%   variable name = ClusterAnalysis(localization data, varargin);
 %
 % varargin comprise the following additional arguments that can be hand over
 %   varargin{1}: name or number of the sample (char or numeric value)
-%   varargin{2}: dimensionality of the sample (2 for 2D or 3 for 3D) - note 3D is not completely implemented 
+%   varargin{2}: dimensionality of the sample (2 for 2D or 3 for 3D) -
+%                note: some function may not fully support 3D data
 %   varargin{3}: algorithm used to calculate local density. allows the following
-%               parameters: 'nearestNeighbor', 'averageDensity',
-%               'convolution', 'kernelDensity', 'specificValue'
+%                parameters: 'averageDensity', 'kernelDensity', 'specificValue'
+%                if 'kernelDensity' is selected and varargin{4} is empty
+%                default paramters are used: sampling distance = 100 nm and
+%                grid spacing = 10 nm
 %   varargin{4}: additional parameter for selected algorithm to create local density: varargin{3}
+%                if 'kernelDensity' is selected the input should be a
+%                1x2 matrix, where the first argument defines the sampling
+%                distance (default: 100 nm) and the second argument the grid
+%                spacing (default: 10 nm)
 %   varargin{5}: algorithm used to create random data from calculated local
-%               density (true = complete spatial randomness (poisson point process);
-%               false = same number of points as in experimental data with calculated local density))
+%                density (true = complete spatial randomness (poisson point process);
+%                false = same number of points as in experimental data with calculated local density))
 %
 % default values:
 %   varargin{1}: '001'
@@ -42,28 +49,25 @@ classdef ClusterAnalysis < handle
 % column 4/5/6 = x/y/z-localization precision
 % column 7 = frame number (not in random table)
 %
-% The following cluster algorithms are currently implemented:
+% The following analysis algorithms are currently implemented:
 %   DBSCAN (A Density-Based Algorithm for Discovering Clusters in Large
-%   Spatial Databases with Noise. Ester at al. 1996)
+%   Spatial Databases with Noise. Ester at al. 1996) - 2D + 3D
 %
-%   k-nearest neighbor distance
+%   k-nearest neighbor distance - 2D + 3D
 %
-%   distance analysis
+%   distance analysis - 2D + 3D
 %
-%   pair correlation algortihm based on distance measure
+%   radial density function - 2D + 3D
 %
-%   currently in development:
-%   Voronoi cluster algorithm (SR-Tesseler: a method to segment and 
-%   quantify localization-based super-resolution microscopy data.
-%   Levet et al. 2015; ClusterViSu, a method for clustering of protein 
-%   complexes by Voronoi tessellation in super- resolution microscopy.
-%   Andronov et al. 2016)
+%   ripley's function - 2D + 3D
 %
-%   parameterEstimation(see DBSCAN)
+%   kernel density estimation - 2D
 %
-%   scatterPlot
+%   parameter estimation for DBSCAN
 %
-%   To perform cluster analysis type:
+%   plotting of data (scatterplot) - 2D + 3D
+%
+% To perform cluster analysis type:
 %   e.g.  cell01.function name(parameter values);
 %
 %
@@ -131,22 +135,17 @@ classdef ClusterAnalysis < handle
             if nargin >= 4
                 randomAlgorithm = varargin{3};
                     randomAlgorithm = validatestring(randomAlgorithm, ...
-                        {'nearestNeighbor', 'averageDensity', 'convolution', 'kernelDensity', 'specificValue'});
-                    switch randomAlgorithm
-                        case 'nearestNeighbor'
-                            % does not need any parameters
-                            randomAlgorithmValue = [];                             
+                        {'averageDensity', 'kernelDensity', 'specificValue'});
+                    switch randomAlgorithm                           
                         case 'averageDensity'
                             % does not need any parameters
                             randomAlgorithmValue = [];
-                        case {'convolution', 'kernelDensity'}
-                            % use half of the estimated spatial resolution
-                            % as filter radius (sigma)
-                            [~, nnDistance] = knnsearch(localizationFile(:, 2:3), localizationFile(:, 2:3), 'K', 2);
-                            randomAlgorithmValue = 0.5 * sqrt( (mean(nnDistance(:, 2), 1))^2 + mean(mean(localizationFile(:, 4:5), 2))^2 );
+                        case 'kernelDensity'
+                            % first value is sampling distance, second value is grid spacing
+                            randomAlgorithmValue = [100 10]; % values are in nm
                         case 'specificValue'
                             if nargin < 5
-                                error('If you want to use a specific value, you must add it as argument to the function!')
+                                error('If you want to use a certain value for the density of the signals, you have to add it as an argument to the function!')
                             end
                     end    
             else            
@@ -196,17 +195,17 @@ classdef ClusterAnalysis < handle
                         otherwise
                             error('Unknown dimension!')
                     end
-                    switch randomAlgorithm
-                        case 'nearestNeighbor'
-                            % does not need any parameters
-                            randomAlgorithmValue = [];                             
+                    switch randomAlgorithm                       
                         case 'averageDensity'
                             % does not need any parameters
                             randomAlgorithmValue = [];
-                        case {'convolution', 'kernelDensity'}
-                            validateattributes(varargin{4}, {'numeric'}, {'nonnegative'})
+                            %%%%%%%%%%%%%%%%%% check this part
+                        case 'kernelDensity'
+                            validateattributes(varargin{4}, {'numeric'}, {'nonnegative', 'size', [1, 2]})
                             if isempty(varargin{4}) 
                                 warning('No value for random algorithm specified. Using default values!')
+                                % first value is sampling distance, second value is grid spacing
+                                randomAlgorithmValue = [100 10]; % values are in nm
                             else    
                                 randomAlgorithmValue = varargin{4};
                             end
@@ -225,17 +224,16 @@ classdef ClusterAnalysis < handle
                         otherwise
                             error('Unknown dimension!')
                     end
-                    switch randomAlgorithm
-                        case 'nearestNeighbor'
-                            % does not need any parameters
-                            randomAlgorithmValue = [];                             
+                    switch randomAlgorithm                       
                         case 'averageDensity'
                             % does not need any parameters
                             randomAlgorithmValue = [];
-                        case {'convolution', 'kernelDensity'}
-                            validateattributes(varargin{4}, {'numeric'}, {'nonnegative'})
+                        case 'kernelDensity'
+                            validateattributes(varargin{4}, {'numeric'}, {'nonnegative', 'size', [1, 2]})
                             if isempty(varargin{4}) 
                                 warning('No value for random algorithm specified. Using default values!')
+                                % first value is sampling distance, second value is grid spacing
+                                randomAlgorithmValue = [100 10]; % values are in nm
                             else    
                                 randomAlgorithmValue = varargin{4};
                             end
@@ -245,13 +243,41 @@ classdef ClusterAnalysis < handle
                     end
                     assumeCSR = varargin{5};
             end
-            %% create cluster class with specified parameters            
+            %% create cluster class with specified parameters
+            % if cooordinates in list of localizations contains negativ values,
+            % they are shifted towards positive values
+            % checks also for NaN values and empty fields
+            if  min(localizationFile(:, 2)) < 0
+                localizationFile(:, 2) = localizationFile(:, 2) - min(localizationFile(:, 2)) + 1;
+                warning('Negative values detected in list of localizations. Shifting coordinates towards positive values!')
+            end
+            if min(localizationFile(:, 3)) < 0
+                localizationFile(:, 3) = localizationFile(:, 3) - min(localizationFile(:, 3)) + 1;
+                warning('Negative values detected in list of localizations. Shifting coordinates towards positive values!')
+            end
+            if any(isnan(localizationFile(:, 2))) || any(isnan(localizationFile(:, 3))) ||...
+                    any(isempty(localizationFile(:, 2))) || any(isempty(localizationFile(:, 3)))
+                warning('List of localizations contains NaN values or empty fields!')
+            end
+            if obj.dimension == 3
+                try
+                    if min(localizationFile(:, 11)) < 0
+                        localizationFile(:, 11) = localizationFile(:, 11) - min(localizationFile(:, 11)) + 1;
+                        warning('Negative values detected in list of localizations. Shifting coordinates towards positive values!')
+                    end
+                    if any(isnan(localizationFile(:, 11))) || any(isempty(localizationFile(:, 11)))
+                        warning('List of localizations contains NaN values or empty fields!')
+                    end
+                catch
+                    error('No z-coordinate found. Are you sure your data contains a z-coordinate and the data is in the correct format?');
+                end
+            end
             % extract positions and localization precision from
-            % localization table in Orte format (i.e. column 2/3 = x/y-position, column 3/5 = x/y-localization precision, column 9 = frame number)
+            % localization table in Orte format (i.e. column 2/3/11 = x/y/z-position, column 3/5/12 = x/y/z-localization precision, column 9 = frame number)
             obj.NoOfPoints = size(localizationFile, 1);
             obj.physicalDimension = [max(localizationFile(:, 2)); max(localizationFile(:, 3)); 0];
-            % change to double if higher precision is needed, to reduce
-            % memory consumption stay with single data type
+            % stay with double data type, otherwise the kdtree (cTree)
+            % might not work
             obj.positionTable = zeros(obj.NoOfPoints, 7, 'double');
             obj.positionTable(:, 1) = localizationFile(:, 2);
             obj.positionTable(:, 2) = localizationFile(:, 3);
@@ -261,7 +287,7 @@ classdef ClusterAnalysis < handle
                 obj.positionTable(:, 4) = localizationFile(:, 4);
                 obj.positionTable(:, 5) = localizationFile(:, 5);
             catch
-                warning('Localization precision is missing?');
+                warning('Localization precision is missing!');
             end
             if obj.dimension == 3
                 obj.positionTable(:, 3) = localizationFile(:, 11);
@@ -273,11 +299,11 @@ classdef ClusterAnalysis < handle
                     obj.queryData = kdtree_build([x y z]);
                     obj.flagSearchTree = 'cTree';
                 catch
-                    warning('Unable to create Ataiya''s kdtree, using Matlab''s internal implementation.');
+                    warning('Unable to create c++ based kdtree, using Matlab''s internal implementation.');
                     obj.queryData = createns(obj.positionTable(:, 1:3));
                     obj.flagSearchTree = 'matlabTree';
                 end
-                obj.physicalDimension(3, 1) = max(localizationFile(:, 3));
+                obj.physicalDimension(3, 1) = max(localizationFile(:, 11));
             else
                 obj.positionTable(:, 3) = NaN;
                 obj.positionTable(:, 6) = NaN;
@@ -287,7 +313,7 @@ classdef ClusterAnalysis < handle
                     obj.queryData = kdtree_build([x y]);
                     obj.flagSearchTree = 'cTree';
                 catch
-                    warning('Unable to create Ataiya''s kdtree, using Matlab''s internal implementation.');
+                    warning('Unable to create c++ based kdtree, using Matlab''s internal implementation.');
                     obj.queryData = createns(obj.positionTable(:, 1:2));
                     obj.flagSearchTree = 'matlabTree';
                 end
@@ -295,59 +321,69 @@ classdef ClusterAnalysis < handle
             obj.clusterStruct = struct([]);
             % choose algorithm for random point distribution
             switch randomAlgorithm
-                case 'nearestNeighbor'
-                    % assumes that one point accumulates a cicular area
-                    % with half of the mean 2-NN-distance
-                    [~, nnDistance] = knnsearch(obj.positionTable(:, 1:2), obj.positionTable(:, 1:2), 'K', 2);
-                    obj.localDensity = 1 / (pi*((mean(nnDistance(:, 2), 1)) /1000 /2)^2); % in 1/ µm^2
                 case 'averageDensity'
-                    obj.localDensity = obj.NoOfPoints / (obj.physicalDimension(1, 1)/1000 * obj.physicalDimension(2, 1)/1000); % in µm^2
-                case 'convolution' 
-                    % estimation of local density using a disk shaped
-                    % kernel and convolution
-                    pixelSize = ceil(randomAlgorithmValue / 2.3); % pixel size calculated from estimated resolution with nyquist criteria
-                    radius = randomAlgorithmValue; % radius of disk shaped kernel in nm
-                    binnedImage = double(visModuleCluster(obj.positionTable, 'histogramBinning', pixelSize));
-                    % create disk shaped kernel
-                    kernel = fspecial('disk', radius);
-                    imageConv = conv2(binnedImage, kernel);
-                    localArea = sum(sum(imageConv > 0)) * (pixelSize/1000)^2; % local area in µm^2
-                    obj.localDensity = obj.NoOfPoints / localArea; 
-                 case 'kernelDensity'
-                     kernelSize = randomAlgorithmValue; % in nm
-                     radius = sqrt(-2*kernelSize^2 *  log(10^(-6)) ); % in nm, calculate neglectable distance
-                     pointDensity = zeros(obj.NoOfPoints, 1, 'single');
-                     % this part is slow and should be improved in feature
-                     % versions
-                     % for waitbar
-                     warning('Kernel density algorithm is slow for large localization tables. This part will be improved in future versions!')
-                     multiWaitbar('computing kernel density...', 0);
-                     prevPercent = 0;
-                     counter = 0;
-                     for ii = 1:obj.NoOfPoints
-                         [~, distances] = rangesearch(obj.positionTable(ii, 1:2), obj.queryData.X, radius);
-                         distances = cell2mat(distances.');
-                         kernel = 1 / (2*pi*kernelSize^2) .* exp(- (distances).^2 ./ (2*kernelSize^2));
-                         pointDensity(ii, 1) = sum(kernel) / size(obj.NoOfPoints, 2) * 1000^2;
-                         % waitbar
-                         currentPercent = fix(100*counter/obj.NoOfPoints);
-                         if currentPercent > prevPercent
-                             multiWaitbar( 'computing kernel density...', 'Value', counter/obj.NoOfPoints);
-                             prevPercent = currentPercent;
-                         end
-                         counter = counter + 1;
-                     end
-                     obj.localDensity = mean(pointDensity);
+                    if obj.dimension == 3
+                        obj.localDensity = obj.NoOfPoints / (obj.physicalDimension(1, 1)/1000 * obj.physicalDimension(2, 1)/1000 * obj.physicalDimension(3, 1)/1000); % in µm^3
+                    else
+                        obj.localDensity = obj.NoOfPoints / (obj.physicalDimension(1, 1)/1000 * obj.physicalDimension(2, 1)/1000); % in µm^2
+                    end
+                case 'kernelDensity'
+                    multiWaitbar('calculating kernel density...', 'Busy');  
+                    if obj.dimension == 3
+                        xGridSpace = round((max(obj.positionTable(:, 1)) - min(obj.positionTable(:, 1))) / randomAlgorithmValue(2));
+                        yGridSpace = round((max(obj.positionTable(:, 2)) - min(obj.positionTable(:, 2))) / randomAlgorithmValue(2));
+                        zGridSpace = round((max(obj.positionTable(:, 3)) - min(obj.positionTable(:, 3))) / randomAlgorithmValue(2));
+                        [x1, x2, x3] = meshgrid(min(obj.positionTable(:, 1)):randomAlgorithmValue(1):max(obj.positionTable(:, 1)),...
+                            min(obj.positionTable(:, 2)):randomAlgorithmValue(1):max(obj.positionTable(:, 2)),...
+                            min(obj.positionTable(:, 3)):randomAlgorithmValue(1):max(obj.positionTable(:, 3)));
+                        x1 = x1(:);
+                        x2 = x2(:);
+                        x3 = x3(:);
+                        xi = [x1 x2 x3];
+                        KDEestimate = ksdensity(obj.positionTable(:, 1:3), xi);
+                        % transform KDEestimate into density per µm²
+                        x = linspace(min(x1), max(x1), xGridSpace);
+                        y = linspace(min(x2), max(x2), yGridSpace);
+                        z = linspace(min(x3), max(x3), zGridSpace);
+                        KDEestimate = KDEestimate * randomAlgorithmValue(1)^3;
+                        [xq, yq, zq] = meshgrid(x, y, z);
+                        z = griddata(x1, x2, x3, KDEestimate, xq, yq, zq);
+                        z = z ./ (max(x1) * max(x2)* max(x3)/(1000*randomAlgorithmValue(2))^3);
+                        obj.localDensity = sum(sum(sum(z)));
+                    else
+                        xGridSpace = round((max(obj.positionTable(:, 1)) - min(obj.positionTable(:, 1))) / randomAlgorithmValue(2));
+                        yGridSpace = round((max(obj.positionTable(:, 2)) - min(obj.positionTable(:, 2))) / randomAlgorithmValue(2));
+                        [x1, x2] = meshgrid(min(obj.positionTable(:, 1)):randomAlgorithmValue(1):max(obj.positionTable(:, 1)), min(obj.positionTable(:, 2)):randomAlgorithmValue(1):max(obj.positionTable(:, 2)));
+                        x1 = x1(:);
+                        x2 = x2(:);
+                        xi = [x1 x2];
+                        KDEestimate = ksdensity(obj.positionTable(:, 1:2), xi);
+                        % transform z from nm into density per µm²
+                        x = linspace(min(x1), max(x1), xGridSpace);
+                        y = linspace(min(x2), max(x2), yGridSpace);
+                        KDEestimate = KDEestimate * randomAlgorithmValue(1).^2;
+                        [xq, yq] = meshgrid(x, y);
+                        z = griddata(x1, x2, KDEestimate, xq, yq);
+                        z = z ./ (max(x1) * max(x2)/(1000*randomAlgorithmValue(2))^2);
+                        obj.localDensity = sum(sum(z));
+                    end
+                    multiWaitbar('calculating kernel density...', 'Close');
                 case 'specificValue'
                      obj.localDensity = randomAlgorithmValue;
             end
             if assumeCSR == true
-                % create CSR with estiamted localDensity
-                nPoints = poissrnd(obj.localDensity*obj.physicalDimension(1, 1)/1000*obj.physicalDimension(2, 1)/1000); % 1000 because localDensity is in µm^2      
+                % create CSR with estimated localDensity
+                if obj.dimension == 3
+                    nPoints = poissrnd(obj.localDensity*obj.physicalDimension(1, 1)/1000*obj.physicalDimension(2, 1)/1000*obj.physicalDimension(3, 1)/1000); % 1000 because localDensity is in µm^3 
+                else
+                    nPoints = poissrnd(obj.localDensity*obj.physicalDimension(1, 1)/1000*obj.physicalDimension(2, 1)/1000); % 1000 because localDensity is in µm^2 
+                end
                 obj.randomTable = zeros(nPoints, 6, 'double');
                 obj.randomNoOfPoints = nPoints;
                 obj.randomTable(:, 1) = (obj.physicalDimension(1, 1)).*rand(nPoints, 1);
                 obj.randomTable(:, 2) = (obj.physicalDimension(2, 1)).*rand(nPoints, 1);
+                % loc. prec. of random table stays empty - if loc. prec. for
+                % random data is desired, insert lines here
                 if obj.dimension == 3
                     obj.randomTable(:, 3) = (obj.physicalDimension(3, 1)).*rand(nPoints, 1);
                 end
@@ -374,7 +410,7 @@ classdef ClusterAnalysis < handle
                     obj.randomQueryData = kdtree_build([x y z]);
                     obj.flagSearchTree = 'cTree';
                 catch
-                    warning('Unable to create Ataiya''s kdtree, using Matlab''s internal implementation.');
+                    warning('Unable to create c++ based kdtree, using Matlab''s internal implementation.');
                     obj.randomQueryData = createns(obj.randomTable(:, 1:3));
                     obj.flagSearchTree = 'matlabTree';
                 end
@@ -386,7 +422,7 @@ classdef ClusterAnalysis < handle
                     obj.randomQueryData = kdtree_build([x y]);
                     obj.flagSearchTree = 'cTree';
                 catch
-                    warning('Unable to create Ataiya''s kdtree, using Matlab''s internal implementation.');
+                    warning('Unable to create c++ based kdtree, using Matlab''s internal implementation.');
                     obj.randomQueryData = createns(obj.randomTable(:, 1:2));
                     obj.flagSearchTree = 'matlabTree';
                end
@@ -402,33 +438,36 @@ classdef ClusterAnalysis < handle
             try
                 kdtree_delete(obj.queryData);
                 kdtree_delete(obj.randomQueryData);
+                obj.queryData = NaN;
+                obj.randomQueryData = NaN;
             catch
             end
         end
         % implemented cluster algorithms
         [varargout] = DBSCAN(obj, radius, minPoints, isRandom, maxDiameter, showImage)
         
-        [varargout] = DBSCANdistanceMatrix(obj, radius, minPoints, isRandom, maxDiameter, showImage)
-        
-        % [varargout] = kNNDistance(obj, k, isRandom, maxDistance, showPlot)
+        [varargout] = kNNDistance(obj, k, isRandom, maxDistance, showPlot)
         
         [varargout] = radialDensityFunction(obj, binSize,  maxRadius, isRandom, showImage)
         
-        [varargout] = radialDensityFunctionDistanceMatrix(obj, binSize,  maxRadius, isRandom, showImage)
-        
         [varargout] = ripley(obj, samplingDistance,  maxRadius, isRandom, showImage)
-        
-        [varargout] = ripleyDistanceMatrix(obj, samplingDistance,  maxRadius, isRandom, showImage)
-        
-        % [varargout] = voronoiCluster(obj, isRandom, showImage)
         
         [varargout] = distanceAnalysis(obj, maxDistance, isRandom, showPlot)
         
-        % [varargout] = gridAnalysis(obj, gridSize, showPlot)
+        [varargout] = gridAnalysis(obj, gridSize, isRandom, showPlot)
         
-        % [varargout] = parameterEstimation(obj, method)
+        [varargout] = parameterEstimation(obj, method)
         
         [varargout] = scatterPlot(obj)
-
+        
+        [varargout] = distanceAnalysisZ(obj, maxDistance, isRandom, showPlot)
+                
+        % algorithms based on distance matrix calculation (2D only); dependent on
+        % input data, these calculations are memory intensive; remove
+        % comments to use them
+        % [varargout] = DBSCANdistanceMatrix(obj, radius, minPoints, isRandom, maxDiameter, showImage)
+        % [varargout] = radialDensityFunctionDistanceMatrix(obj, binSize,  maxRadius, isRandom, showImage)
+        % [varargout] = ripleyDistanceMatrix(obj, samplingDistance,  maxRadius, isRandom, showImage)
+        
     end
 end

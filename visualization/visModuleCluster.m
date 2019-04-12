@@ -62,7 +62,7 @@ switch visMethod
                 h = fspecial('gaussian', 2*ceil(2*globalBlur) + 1, globalBlur);
                 SRimage = SRimage + imfilter(tempImage, h, 'conv');
                 % alternative implement own filter
-                % maskSize = 2*ceil(2*globlBlur) + 1;
+                % maskSize = 2*ceil(2*globalBlur) + 1;
                 % ind = -floor(maskSize/2) : floor(maskSize/2);
                 % [X, Y] = meshgrid(ind, ind);
                 % h = exp(-(X.^2 + Y.^2)/(2*globalBlur*globalBlur));
