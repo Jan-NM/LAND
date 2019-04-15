@@ -65,9 +65,17 @@ else
     end
 end
 if isRandom == true
-    dataSize = min(obj.randomPhysicalDimension);
+    if obj.dimension == 3
+        dataSize = min(obj.randomPhysicalDimension(1:3));
+    else
+        dataSize = min(obj.randomPhysicalDimension(1:2));
+    end
 else
-    dataSize = min(obj.physicalDimension);
+    if obj.dimension == 3
+        dataSize = min(obj.physicalDimension(1:3));
+    else
+        dataSize = min(obj.physicalDimension(1:2));
+    end
 end
 if dataSize < 3*maxDistance
     disp('Image size is smaller then 3 times the cut-off distance! Try to decrease cut-off distance or increase image region.');
@@ -76,12 +84,23 @@ end
 %% distance calculation
 % re-sort points in such a way that boundary points are at the end of the
 % list
-mapSize = ceil(max(positions(:, 1:2)));
-currentPositions = positions(positions(:, 1) > maxDistance & positions(:, 1) < mapSize(1)-maxDistance...
-    & positions(:, 2) > maxDistance & positions(:, 2) < mapSize(2)-maxDistance, :);
-outsidePositions = positions( (positions(:, 1) <= maxDistance | positions(:, 1) >= mapSize(1)-maxDistance)...
-    | (positions(:, 2) <= maxDistance | positions(:, 2) >= mapSize(2)-maxDistance), :);
-positions = cat(1, currentPositions, outsidePositions);
+if obj.dimension == 3
+    mapSize = ceil(max(positions(:, 1:3)));
+    currentPositions = positions(positions(:, 1) > maxDistance & positions(:, 1) < mapSize(1)-maxDistance...
+        & positions(:, 2) > maxDistance & positions(:, 2) < mapSize(2)-maxDistance...
+        & positions(:, 3) > maxDistance & positions(:, 3) < mapSize(3) - maxDistance, :);
+    outsidePositions = positions( (positions(:, 1) <= maxDistance | positions(:, 1) >= mapSize(1)-maxDistance)...
+        | (positions(:, 2) <= maxDistance | positions(:, 2) >= mapSize(2)-maxDistance)...
+        | positions(:, 3) <= maxDistance | positions(:, 3) >= mapSize(3) - maxDistance, :);
+    positions = cat(1, currentPositions, outsidePositions);
+else
+    mapSize = ceil(max(positions(:, 1:2)));
+    currentPositions = positions(positions(:, 1) > maxDistance & positions(:, 1) < mapSize(1)-maxDistance...
+        & positions(:, 2) > maxDistance & positions(:, 2) < mapSize(2)-maxDistance, :);
+    outsidePositions = positions( (positions(:, 1) <= maxDistance | positions(:, 1) >= mapSize(1)-maxDistance)...
+        | (positions(:, 2) <= maxDistance | positions(:, 2) >= mapSize(2)-maxDistance), :);
+    positions = cat(1, currentPositions, outsidePositions);
+end
 % cell array for saving distances
 distanceCell = cell(1, size(currentPositions, 1));
 nDistanceCell = 1;
@@ -91,15 +110,35 @@ prevPercent = 0;
 counter = 1;
 
 for ii = 1 : size(currentPositions, 1)
-    % check if point is within the image border
-    if (positions(ii, 1) > maxDistance && positions(ii, 1) < mapSize(1)-maxDistance...
-            && positions(ii, 2) > maxDistance && positions(ii, 2) < mapSize(2)-maxDistance)
-        % calculate distance of current point to all other points that have
-        % not yet been visited
-        segment = positions(ii:end, :);
-        currentDistance = single(pdist2(segment(:, 1:2), positions(ii, 1:2)));
-        distanceCell{nDistanceCell} = reshape(currentDistance, [], 1);
-        nDistanceCell = nDistanceCell + 1;
+    if obj.dimension == 3
+        % check if point is within the image border
+        if (positions(ii, 1) > maxDistance && positions(ii, 1) < mapSize(1)-maxDistance...
+                && positions(ii, 2) > maxDistance && positions(ii, 2) < mapSize(2)-maxDistance...
+                && positions(ii, 3) > maxDistance && positions(ii, 3) < mapSize(3) - maxDistance)
+            % calculate distance of current point to all other points that have
+            % not yet been visited
+            segment = positions(ii:end, :);
+            currentDistance = single(pdist2(segment(:, 1:3), positions(ii, 1:3)));
+            % removes distances larger then maxDistance
+            currentIdx = (currentDistance <= maxDistance & currentDistance > 0);
+            currentDistance = currentDistance(currentIdx);
+            distanceCell{nDistanceCell} = reshape(currentDistance, [], 1);
+            nDistanceCell = nDistanceCell + 1;
+        end
+    else
+        % check if point is within the image border
+        if (positions(ii, 1) > maxDistance && positions(ii, 1) < mapSize(1)-maxDistance...
+                && positions(ii, 2) > maxDistance && positions(ii, 2) < mapSize(2)-maxDistance)
+            % calculate distance of current point to all other points that have
+            % not yet been visited
+            segment = positions(ii:end, :);
+            currentDistance = single(pdist2(segment(:, 1:2), positions(ii, 1:2)));
+            % removes distances larger then maxDistance
+            currentIdx = (currentDistance <= maxDistance & currentDistance > 0);
+            currentDistance = currentDistance(currentIdx);
+            distanceCell{nDistanceCell} = reshape(currentDistance, [], 1);
+            nDistanceCell = nDistanceCell + 1;
+        end
     end
     % waitbar
     currentPercent = fix(100*counter/size(currentPositions, 1));
@@ -110,9 +149,6 @@ for ii = 1 : size(currentPositions, 1)
     counter = counter + 1;
 end
 distances = (cell2mat(distanceCell.'));
-% removes distances larger then maxDistance
-currentIdx = (distances <= maxDistance & distances > 0);
-distances = distances(currentIdx);
 %% visualization
 if showPlot == true
     figure( 'Name', num2str(obj.sampleID) );
