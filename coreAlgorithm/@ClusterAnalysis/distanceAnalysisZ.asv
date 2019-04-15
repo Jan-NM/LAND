@@ -64,33 +64,26 @@ else
         isDBSCAN = true;
     end
 end
-%% distance calculation
-% calculate distance using cell grid based algorithm
-% check size of localization table and split localization table
 if isRandom == true
-    if obj.dimension == 3
-        dataSize = min(obj.randomPhysicalDimension(1), obj.randomPhysicalDimension(2), obj.randomPhysicalDimension(3));
-    else
-        dataSize = min(obj.randomPhysicalDimension(1), obj.randomPhysicalDimension(2));
-    end
+    dataSize = min(obj.randomPhysicalDimension);
 else
-    if obj.dimension == 3
-        dataSize = min(obj.randomPhysicalDimension(1), obj.randomPhysicalDimension(2), obj.physicalDimension(3));
-    else
-        dataSize = min(obj.physicalDimension(1), obj.physicalDimension(2));
-    end
+    dataSize = min(obj.physicalDimension);
 end
 if dataSize < 3*maxDistance
     disp('Image size is smaller then 3 times the cut-off distance! Try to decrease cut-off distance or increase image region.');
     return
 end
-%%
-% sort positions
-%positions = sortrows(positions, 1);
-% get current points
+%% distance calculation
+% re-sort points in such a way that p
 mapSize = ceil(max(positions(:, 1:2)));
 currentPositions = positions(positions(:, 1) > maxDistance & positions(:, 1) < mapSize(1)-maxDistance...
     & positions(:, 2) > maxDistance & positions(:, 2) < mapSize(2)-maxDistance, :);
+
+
+outsidePositions = positions( (positions(:, 1) <= maxDistance | positions(:, 1) >= mapSize(1)-maxDistance)...
+    | (positions(:, 2) <= maxDistance | positions(:, 2) >= mapSize(2)-maxDistance), :);
+
+positions = cat(1, currentPositions, outsidePositions);
 
 distanceCell = cell(1, size(currentPositions, 1));
 
@@ -99,34 +92,29 @@ multiWaitbar('calculating distances...', 0);
 prevPercent = 0;
 counter = 1;
 
-distances = [];
 tcounter = 1;
 
-n = size(positions, 1);
+n = size(currentPositions, 1);
 for ii = 1 : n
     % check if point is at image border
     if (positions(ii, 1) > maxDistance && positions(ii, 1) < mapSize(1)-maxDistance...
             && positions(ii, 2) > maxDistance && positions(ii, 2) < mapSize(2)-maxDistance)
         
-         segment = positions(ii:end, :);
-         segment = segment(segment(:, 1) <= positions(ii, 1)+maxDistance & segment(:, 1) > positions(ii, 1)-maxDistance...
-            & segment(:, 2) <= positions(ii, 2)+maxDistance & segment(:, 2) > positions(ii, 2)-maxDistance, :);
-        
-         
+        segment = positions(ii:end, :);
         currentDistance = single(pdist2(segment(:, 1:2), positions(ii, 1:2)));
-        distances = [distances; currentDistance];
-        %distanceCell{tcounter} = reshape(currentDistance, [], 1);
-        %tcounter = tcounter + 1;
+        
+        distanceCell{tcounter} = reshape(currentDistance, [], 1);
+        tcounter = tcounter + 1;
     end
     % waitbar
-    currentPercent = fix(100*counter/size(positions, 1));
+    currentPercent = fix(100*counter/size(currentPositions, 1));
     if currentPercent > prevPercent
-        multiWaitbar( 'calculating distances...', 'Value', counter/size(positions, 1));
+        multiWaitbar( 'calculating distances...', 'Value', counter/size(currentPositions, 1));
         prevPercent = currentPercent;
     end
     counter = counter + 1;
 end
-% distances = (cell2mat(distanceCell.'));
+distances = (cell2mat(distanceCell.'));
 % removes distances larger then maxDistance
 currentIdx = (distances <= maxDistance & distances > 0);
 distances = distances(currentIdx);

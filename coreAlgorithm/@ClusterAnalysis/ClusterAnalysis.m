@@ -338,7 +338,8 @@ classdef ClusterAnalysis < handle
                         x2 = x2(:);
                         x3 = x3(:);
                         xi = [x1 x2 x3];
-                        KDEestimate = ksdensity(obj.positionTable(:, 1:3), xi);
+                        bw = obj.NoOfPoints * (-1 / (obj.dimension + 4)); % bandwidth is estimated by Scott's rule
+                        KDEestimate = mvksdensity(obj.positionTable(:, 1:3), xi, 'Bandwidth', bw);
                         % transform KDEestimate into density per µm²
                         x = linspace(min(x1), max(x1), xGridSpace);
                         y = linspace(min(x2), max(x2), yGridSpace);
@@ -455,8 +456,6 @@ classdef ClusterAnalysis < handle
         [varargout] = parameterEstimation(obj, method)
         
         [varargout] = scatterPlot(obj)
-        
-        [varargout] = distanceAnalysisZ(obj, maxDistance, isRandom, showPlot)
                 
         % algorithms based on distance matrix calculation (2D only); dependent on
         % input data, these calculations are memory intensive; remove
@@ -465,6 +464,7 @@ classdef ClusterAnalysis < handle
         % [varargout] = DBSCANdistanceMatrix(obj, radius, minPoints, isRandom, maxDiameter, showImage)
         % [varargout] = radialDensityFunctionDistanceMatrix(obj, binSize,  maxRadius, isRandom, showImage)
         % [varargout] = ripleyDistanceMatrix(obj, samplingDistance,  maxRadius, isRandom, showImage)
+        % [varargout] = distanceAnalysisGridBased(obj, maxDistance, isRandom, showPlot)
         
     end
 end

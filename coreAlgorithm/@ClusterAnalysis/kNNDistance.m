@@ -136,13 +136,13 @@ if showPlot == true
     figure('Name', [num2str(k), '-Nearest Neighbor Distances: ',num2str(obj.sampleID)] );
     if isDBSCAN == true
             plotCounter = 3; % check if outer or inner k-NN distances exist
-            if ~isempty(innerNNDistance)
+            if isempty(innerNNDistance)
                 plotCounter = plotCounter - 1;
             end
-            if ~isempty(outerNNDistance)
+            if isempty(outerNNDistance)
                 plotCounter = plotCounter - 1;
             end
-            subplot(1, plotCounter, 1)
+            subplot(1, plotCounter, 1) 
             histogram(nnDistances, ceil(max(nnDistances(:, 1))), 'Normalization', 'probability');
             grid on;
             title('all points');

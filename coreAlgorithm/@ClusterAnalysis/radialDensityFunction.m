@@ -75,6 +75,7 @@ end
 if isempty(currentPositions)
     error(['Image size is too small or maxRadius is too big! Can not find any points which have ', num2str(maxRadius), ' nm distance from the image borders! Try to decrease maxRadius or increase image region.']);
 end
+nPointsFinal = size(currentPositions, 1);
 
 % for waitbar
 prevPercent = 0;
@@ -109,15 +110,14 @@ for ii = 1:size(currentPositions, 1)
         binArray(ll, 1) = binArray(ll, 1) + numel(radOutDistances) - numel(radInDistances); % number of points within shell dr
     end
     % waitbar
-    currentPercent = fix(100*counter/nPoints);
+    currentPercent = fix(100*counter/nPointsFinal );
     if currentPercent > prevPercent
-        multiWaitbar( 'computing radial density function...', 'Value', counter/nPoints);
+        multiWaitbar( 'computing radial density function...', 'Value', counter/nPointsFinal );
         prevPercent = currentPercent;
     end
     counter = counter + 1;
 end
 %% normalize data (g(r) = binArray(ii) / (binArea*density*nPoints)) - center of each bin is taken as r
-nPointsFinal = size(currentPositions, 1);
 if obj.dimension == 3
     density = nPoints / (physicalDimension(1, :) * physicalDimension(2, :) * physicalDimension(3, :));
 else

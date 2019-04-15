@@ -10,7 +10,16 @@ switch method
         %% calculate nearest neighbor distance (k = 2)
         positions = obj.positionTable;
         treeData = obj.queryData;
-        [~, nnDistance] = knnsearch(treeData.X, treeData.X, 'K', 2);
+        switch obj.flagSearchTree
+            case 'cTree' % for knn search, use Matlab's internal function
+                if obj.dimension == 3
+                    [~, nnDistance] = knnsearch(positions(:, 1:3), positions(:, 1:3), 'K', 3);
+                else
+                    [~, nnDistance] = knnsearch(positions(:, 1:2), positions(:, 1:2), 'K', 3);
+                end
+            case 'matlabTree'
+                [~, nnDistance] = knnsearch(treeData.X, treeData.X, 'K', 3);
+        end
         nnDistances = mean(nnDistance(:, 2:end), 2);
         % plot histogram
         histogram(nnDistances, 'Normalization', 'probability');
@@ -25,8 +34,17 @@ switch method
         defaultans = {'2'};
         radius = inputdlg(prompt,dlg_title,num_lines,defaultans);
         radius = str2double(radius{1});
-        [~, distance] = rangesearch(positions(:, 1:2), treeData.X, radius); % should be done on a cropped dataset for large position tables
-        minPoints = cellfun(@length, distance);
+        switch obj.flagSearchTree  % should be done on a cropped dataset for large position tables
+            case 'cTree'
+                if obj.dimension == 3
+                    [~, distance] = rangesearch(positions(:, 1:3), positions(:, 1:3), radius);
+                else
+                    [~, distance] = rangesearch(positions(:, 1:2), positions(:, 1:2), radius);
+                end
+            case 'matlabTree'
+                [~, distance] = rangesearch(positions(:, 1:2), treeData.X, radius);
+        end
+        minPoints = cellfun('length', distance);
         subplot(2,2,2)
         histogram(minPoints)
         title(['Frequency of number of neighbors for radius ' num2str(radius)]);
@@ -42,7 +60,16 @@ switch method
         k = inputdlg(prompt,dlg_title,num_lines,defaultans);
         k = str2double(k{1});
         % calculate k-NN distance
-        [~, nnDistance] = knnsearch(treeData.X, treeData.X, 'K', k);
+        switch obj.flagSearchTree
+            case 'cTree' % for knn search, use Matlab's internal function
+                if obj.dimension == 3
+                    [~, nnDistance] = knnsearch(positions(:, 1:3), positions(:, 1:3), 'K', k);
+                else
+                    [~, nnDistance] = knnsearch(positions(:, 1:2), positions(:, 1:2), 'K', k);
+                end
+            case 'matlabTree'
+                [~, nnDistance] = knnsearch(treeData.X, treeData.X, 'K', k);
+        end
         % mean over NN distance
         nnDistances = mean(nnDistance(:, 2:end), 2);
         %% create k-distance graph

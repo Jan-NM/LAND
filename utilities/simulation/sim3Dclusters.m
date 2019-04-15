@@ -1,9 +1,9 @@
 %% for 3D
 imageSize = 3000; % image size in nm
-density = 50; % density of points in 1/µm² over entire image
+density = 150; % density of points in 1/µm² over entire image
 densityCluster = 5; % density of cluster in 1/µm² over entire image
 clusterPoints = 0.6; % percentage of points within cluster
-clusterSize = 60; % diameter of cluster in nm;
+clusterSize = 30; % diameter of cluster in nm;
 
 %% calculate parameters
 % calculate number of points from density

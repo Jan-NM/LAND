@@ -75,6 +75,7 @@ end
 if isempty(currentPositions)
     error('Image size is to small or maxRadius is to big! Can not find any points which have maxRadius distance from the image borders! Try to decrease maxRadius or increase image region.');
 end
+nPointsFinal = size(currentPositions, 1);
 
 % for waitbar
 prevPercent = 0;
@@ -103,16 +104,15 @@ for ii = 1:size(currentPositions, 1)
         binArray(ll, 1) = binArray(ll, 1) + numel(radDistances) - 1; % sum up points within r, ignore current point
     end
     % waitbar
-    currentPercent = fix(100*counter/nPoints);
+    currentPercent = fix(100*counter/nPointsFinal);
     if currentPercent > prevPercent
-        multiWaitbar( 'computing Ripley''s H-function...', 'Value', counter/nPoints);
+        multiWaitbar( 'computing Ripley''s H-function...', 'Value', counter/nPointsFinal);
         prevPercent = currentPercent;
     end
     counter = counter + 1;
 end
 
 %% normalize data
-nPointsFinal = size(currentPositions, 1);
 if obj.dimension == 3
     density = nPoints / (physicalDimension(1, :) * physicalDimension(2, :) * physicalDimension(3, :));
 else
