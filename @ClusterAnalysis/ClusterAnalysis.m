@@ -19,7 +19,7 @@ classdef ClusterAnalysis < handle
 %
 %   variable name = ClusterAnalysis(localization data, varargin);
 %
-% varargin comprise the following additional arguments that can be hand over
+% varargin comprise the following additional arguments that can be handed over
 %   varargin{1}: name or number of the sample (char or numeric value)
 %   varargin{2}: dimensionality of the sample (2 for 2D or 3 for 3D) -
 %                note: some function may not fully support 3D data
@@ -47,9 +47,10 @@ classdef ClusterAnalysis < handle
 % The created position table / random table has the following order:
 % column 1/2/3 = x/y/z-position
 % column 4/5/6 = x/y/z-localization precision
-% column 7 = frame number (not in random table)
+% column 7 = frame number (not available in random table)
 %
 % The following analysis algorithms are currently implemented:
+%
 %   DBSCAN (A Density-Based Algorithm for Discovering Clusters in Large
 %   Spatial Databases with Noise. Ester at al. 1996) - 2D + 3D
 %
@@ -60,8 +61,6 @@ classdef ClusterAnalysis < handle
 %   radial density function - 2D + 3D
 %
 %   ripley's function - 2D + 3D
-%
-%   kernel density estimation - 2D
 %
 %   parameter estimation for DBSCAN
 %
@@ -79,7 +78,7 @@ classdef ClusterAnalysis < handle
 %   multiWaitbar (https://de.mathworks.com/matlabcentral/fileexchange/26589-multiwaitbar-label-varargin,
 %   from Matlab File Exchange, included in this distribution)
 %   Andrea Tagliasacchi's C++ kdtree implementation(https://github.com/ataiya/kdtree,
-%   version is included in this distribution - but should be compiled on system used)
+%   version is not included in this distribution)
 %   At least 8 GByte RAM are recommended.
 %
 %
@@ -142,7 +141,7 @@ classdef ClusterAnalysis < handle
                             randomAlgorithmValue = [];
                         case 'kernelDensity'
                             % first value is sampling distance, second value is grid spacing
-                            randomAlgorithmValue = [100 10]; % values are in nm
+                            randomAlgorithmValue = [100 10]; % in nm
                         case 'specificValue'
                             if nargin < 5
                                 error('If you want to use a certain value for the density of the signals, you have to add it as an argument to the function!')
@@ -199,7 +198,6 @@ classdef ClusterAnalysis < handle
                         case 'averageDensity'
                             % does not need any parameters
                             randomAlgorithmValue = [];
-                            %%%%%%%%%%%%%%%%%% check this part
                         case 'kernelDensity'
                             validateattributes(varargin{4}, {'numeric'}, {'nonnegative', 'size', [1, 2]})
                             if isempty(varargin{4}) 
@@ -273,7 +271,7 @@ classdef ClusterAnalysis < handle
                 end
             end
             % extract positions and localization precision from
-            % localization table in Orte format (i.e. column 2/3/11 = x/y/z-position, column 3/5/12 = x/y/z-localization precision, column 9 = frame number)
+            % localization table in Orte format (i.e. column 2/3/11 = x/y/z-position, column 4/5/12 = x/y/z-localization precision, column 9 = frame number)
             obj.NoOfPoints = size(localizationFile, 1);
             obj.physicalDimension = [max(localizationFile(:, 2)); max(localizationFile(:, 3)); 0];
             % stay with double data type, otherwise the kdtree (cTree)
@@ -430,7 +428,7 @@ classdef ClusterAnalysis < handle
             end
             obj.randomClusterStruct = struct([]);
             if isempty(obj.randomNoOfPoints) || obj.randomNoOfPoints < 2
-                warning('Number of random points is lower than 2. This could lead to errors, if random data is used for calculation. Maybe parameters specified in calculation of random data are not choosen appropriate.')
+                warning('Number of random points is lower than 2. This could lead to errors, if random data is used for calculations.')
             end
         end
         % destructor
@@ -454,8 +452,6 @@ classdef ClusterAnalysis < handle
         
         [varargout] = distanceAnalysis(obj, maxDistance, isRandom, showPlot)
         
-        [varargout] = gridAnalysis(obj, gridSize, isRandom, showPlot)
-        
         [varargout] = parameterEstimation(obj, method)
         
         [varargout] = scatterPlot(obj)
@@ -464,7 +460,8 @@ classdef ClusterAnalysis < handle
                 
         % algorithms based on distance matrix calculation (2D only); dependent on
         % input data, these calculations are memory intensive; remove
-        % comments to use them
+        % comments to use them; 
+        
         % [varargout] = DBSCANdistanceMatrix(obj, radius, minPoints, isRandom, maxDiameter, showImage)
         % [varargout] = radialDensityFunctionDistanceMatrix(obj, binSize,  maxRadius, isRandom, showImage)
         % [varargout] = ripleyDistanceMatrix(obj, samplingDistance,  maxRadius, isRandom, showImage)
