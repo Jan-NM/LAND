@@ -65,68 +65,41 @@ else
     end
 end
 if isRandom == true
-    if obj.dimension == 3
-        dataSize = min(obj.randomPhysicalDimension(1:3));
-    else
-        dataSize = min(obj.randomPhysicalDimension(1:2));
-    end
+    dataSize = min(obj.randomPhysicalDimension(1:obj.dimension));
 else
-    if obj.dimension == 3
-        dataSize = min(obj.physicalDimension(1:3));
-    else
-        dataSize = min(obj.physicalDimension(1:2));
-    end
+    dataSize = min(obj.physicalDimension(1:obj.dimension));
 end
 if dataSize < 3*maxDistance
     disp('Image size is smaller then 3 times the cut-off distance! Try to decrease cut-off distance or increase image region.');
     return
 end
 %% perform distance calculation
-distances = distanceCalculation(positions, obj.dimension, maxDistance);
+imageSize = ceil(max(positions(:, 1:obj.dimension)));
+distances = distanceCalculation(positions, obj.dimension, imageSize, maxDistance);
 % distance calculation for points inside and outside of clusters
 if isDBSCAN == true
-    if obj.dimension == 3
-        % for outside points clusterAssignment is 0
-        tempCluster = clusterAssignment(:, 1) == 0;
-        outerPositions = positions(tempCluster, 1:3);
-        if isRandom == true
-            [~, idx] = datasample(positions, numberOfSample);
-            outerPositions = positions(idx, 1:3);
-        end
-        outerDistances = distanceCalculation(outerPositions, obj.dimension, maxDistance);
-    else
-        % for outside points clusterAssignment is 0
-        tempCluster = clusterAssignment(:, 1) == 0;
-        outerPositions = positions(tempCluster, 1:2);
-        if isRandom == true
-            [~, idx] = datasample(positions, numberOfSample);
-            outerPositions = positions(idx, 1:2);
-        end
-        outerDistances = distanceCalculation(outerPositions, obj.dimension, maxDistance);  
-    end    
-end
-   
-if isDBSCAN == true
-    innerDistance = []; % assumes that size of the cluster and number of points within a cluster is small enough to be able to use pdist function
+    % for outside points clusterAssignment is 0
+    tempCluster = clusterAssignment(:, 1) == 0;
+    outerPositions = positions(tempCluster, 1:obj.dimension);
+    if isRandom == true
+        [~, idx] = datasample(positions, numberOfSample);
+        outerPositions = positions(idx, 1:obj.dimension);
+    end
+    outerDistances = distanceCalculation(outerPositions, obj.dimension, imageSize, maxDistance);
+    % for points within clusters
     if any(clusterAssignment)
+        innerDistances = cell(1, max(clusterAssignment));
         for kk = 1:max(clusterAssignment)
             tempCluster = clusterAssignment(:, 1) == kk;
-            if obj.dimension == 3
-                innerPoints = positions(tempCluster, 1:3);
-                % calculates pairwise distances using pdist function
-                tempInnerDistance = single(pdist(innerPoints(:, 1:3)))';
-                % removes distances larger then maxDistance
-                currentIdx = (tempInnerDistance <= maxDistance & tempInnerDistance > 0);
-                innerDistances = cat(1, innerDistance, tempInnerDistance(currentIdx));
-            else
-                innerPoints = positions(tempCluster, 1:2);
-                % calculates pairwise distances using pdist function
-                tempInnerDistance = single(pdist(innerPoints(:, 1:2)))';
-                % removes distances larger then maxDistance
-                currentIdx = (tempInnerDistance <= maxDistance & tempInnerDistance > 0);
-                innerDistances = cat(1, innerDistance, tempInnerDistance(currentIdx));
-            end
+            innerPositions = positions(tempCluster, 1:obj.dimension);
+            innerDistances{kk} = distanceCalculation(innerPositions, obj.dimension, imageSize, maxDistance);
         end
+        % remove empty cell arrays -> cluster had been outside the
+        % boundary
+        innerDistances = innerDistances(~cellfun('isempty',innerDistances));
+        innerDistances = (cell2mat(innerDistances.'));
+    else
+        innerDistances = 0;
     end
 end
 %% visualization
@@ -181,11 +154,10 @@ end
 end
 
 
-function dist = distanceCalculation(positions, dim, maxDistance)
+function dist = distanceCalculation(positions, dim, mapSize, maxDistance)
 % re-sort points in such a way that boundary points are at the end of the
 % list
 if dim == 3
-    mapSize = ceil(max(positions(:, 1:3)));
     currentPositions = positions(positions(:, 1) > maxDistance & positions(:, 1) < mapSize(1)-maxDistance...
         & positions(:, 2) > maxDistance & positions(:, 2) < mapSize(2)-maxDistance...
         & positions(:, 3) > maxDistance & positions(:, 3) < mapSize(3) - maxDistance, :);
@@ -194,7 +166,6 @@ if dim == 3
         | positions(:, 3) <= maxDistance | positions(:, 3) >= mapSize(3) - maxDistance, :);
     positions = cat(1, currentPositions, outsidePositions);
 else
-    mapSize = ceil(max(positions(:, 1:2)));
     currentPositions = positions(positions(:, 1) > maxDistance & positions(:, 1) < mapSize(1)-maxDistance...
         & positions(:, 2) > maxDistance & positions(:, 2) < mapSize(2)-maxDistance, :);
     outsidePositions = positions( (positions(:, 1) <= maxDistance | positions(:, 1) >= mapSize(1)-maxDistance)...
