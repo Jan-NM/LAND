@@ -238,17 +238,10 @@ end
 Clusterparamstruct.compareRandomData = get(handles.compareRandom, 'Value');
 if Clusterparamstruct.compareRandomData == 1
     Clusterparamstruct.randomAlgorithm = get(handles.CSR, 'Value');
-    if get(handles.NNbased, 'Value') == 1
-        Clusterparamstruct.densityAlgorithm = 'nearestNeighbor';
-        Clusterparamstruct.randomAlgorithmValue = []; % should stey empty - parameter is not needed
     end
     if get(handles.avgDensity, 'Value') == 1
         Clusterparamstruct.densityAlgorithm = 'averageDensity';
         Clusterparamstruct.randomAlgorithmValue = []; % should stey empty - parameter is not needed
-    end
-    if get(handles.convEstimation, 'Value') == 1
-        Clusterparamstruct.densityAlgorithm = 'convolution';
-        Clusterparamstruct.randomAlgorithmValue = str2double(get(handles.convRadius, 'String'));
     end
     if get(handles.kernelDensity, 'Value') == 1
         Clusterparamstruct.densityAlgorithm = 'kernelDensity';
@@ -289,9 +282,6 @@ Clusterparamstruct.RDF.maxDistance = str2double(get(handles.maxDistRDF, 'String'
 Clusterparamstruct.ripley.algorithm = get(handles.ripley, 'Value');
 Clusterparamstruct.ripley.radius = str2double(get(handles.ripleyRadius, 'String')); % in nm
 Clusterparamstruct.ripley.maxDistance = str2double(get(handles.ripleyDistance, 'String')); % in nm
-
-% parameter for grid analysis
-Clusterparamstruct.gridAna.algorithm = get(handles.gridAna, 'Value');
 
 % get name of sample
 if isempty(get(handles.treatmentName, 'String'))
@@ -516,25 +506,19 @@ function compareRandom_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 if(get(hObject,'Value'))
-     set(handles.CSR, 'Enable', 'on');
-     set(handles.NNbased, 'Enable', 'on');   
+     set(handles.CSR, 'Enable', 'on');   
      set(handles.avgDensity, 'Enable', 'on');
-     set(handles.convEstimation, 'Enable', 'on');
      set(handles.kernelDensity, 'Enable', 'on');
      set(handles.specValue, 'Enable', 'on');
-     set(handles.convRadius, 'Enable', 'on');
      set(handles.kernelRadius, 'Enable', 'on');
      set(handles.randomValue, 'Enable', 'on');
 else
     set(handles.CSR, 'Enable', 'off');
-    set(handles.NNbased, 'Enable', 'off');   
-     set(handles.avgDensity, 'Enable', 'off');
-     set(handles.convEstimation, 'Enable', 'off');
-     set(handles.kernelDensity, 'Enable', 'off');
-     set(handles.specValue, 'Enable', 'off');
-     set(handles.convRadius, 'Enable', 'off');
-     set(handles.kernelRadius, 'Enable', 'off');
-     set(handles.randomValue, 'Enable', 'off');
+    set(handles.avgDensity, 'Enable', 'off');
+    set(handles.kernelDensity, 'Enable', 'off');
+    set(handles.specValue, 'Enable', 'off');
+    set(handles.kernelRadius, 'Enable', 'off');
+    set(handles.randomValue, 'Enable', 'off');
 end
 % Hint: get(hObject,'Value') returns toggle state of compareRandom
 
@@ -734,40 +718,14 @@ else
 end
 
 
-% --- Executes on button press in NNbased.
-function NNbased_Callback(hObject, eventdata, handles)
-% hObject    handle to NNbased (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-set(handles.avgDensity, 'Value', 0);
-set(handles.convEstimation, 'Value', 0);
-set(handles.kernelDensity, 'Value', 0);
-set(handles.specValue, 'Value', 0);
-% Hint: get(hObject,'Value') returns toggle state of NNbased
-
-
 % --- Executes on button press in avgDensity.
 function avgDensity_Callback(hObject, eventdata, handles)
 % hObject    handle to avgDensity (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-set(handles.NNbased, 'Value', 0);
-set(handles.convEstimation, 'Value', 0);
 set(handles.kernelDensity, 'Value', 0);
 set(handles.specValue, 'Value', 0);
 % Hint: get(hObject,'Value') returns toggle state of avgDensity
-
-
-% --- Executes on button press in convEstimation.
-function convEstimation_Callback(hObject, eventdata, handles)
-% hObject    handle to convEstimation (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-set(handles.NNbased, 'Value', 0);
-set(handles.avgDensity, 'Value', 0);
-set(handles.kernelDensity, 'Value', 0);
-set(handles.specValue, 'Value', 0);
-% Hint: get(hObject,'Value') returns toggle state of convEstimation
 
 
 % --- Executes on button press in kernelDensity.
@@ -775,9 +733,7 @@ function kernelDensity_Callback(hObject, eventdata, handles)
 % hObject    handle to kernelDensity (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-set(handles.NNbased, 'Value', 0);
 set(handles.avgDensity, 'Value', 0);
-set(handles.convEstimation, 'Value', 0);
 set(handles.specValue, 'Value', 0);
 % Hint: get(hObject,'Value') returns toggle state of kernelDensity
 
@@ -787,34 +743,9 @@ function specValue_Callback(hObject, eventdata, handles)
 % hObject    handle to specValue (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-set(handles.NNbased, 'Value', 0);
 set(handles.avgDensity, 'Value', 0);
-set(handles.convEstimation, 'Value', 0);
 set(handles.kernelDensity, 'Value', 0);
 % Hint: get(hObject,'Value') returns toggle state of specValue
-
-
-function convRadius_Callback(hObject, eventdata, handles)
-% hObject    handle to convRadius (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of convRadius as text
-%        str2double(get(hObject,'String')) returns contents of convRadius as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function convRadius_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to convRadius (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
 
 
 function kernelRadius_Callback(hObject, eventdata, handles)
@@ -1002,12 +933,3 @@ function ripley_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of ripley
-
-
-% --- Executes on button press in gridAna.
-function gridAna_Callback(hObject, eventdata, handles)
-% hObject    handle to gridAna (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of gridAna

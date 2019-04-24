@@ -1,38 +1,34 @@
 function [] = distanceAnalysis(obj, maxDistance, isRandom, showPlot)
 %distanceAnalyses calculates pairwise distances
 %
-% Image is divided into a grid with a cell size specified by maxDistance.
-% Distances from points in the outer cells of the grid are not caluclated to
+% Calculates pairwise distances between detected signals. Distances from points
+% that are locatred within maxDistance from the image border are not caluclated to
 % avoid edge effects.
-%
-% Image based waitbar displays progress of computation. This could be
-% replaced in future versions using a conventional waitbar.
-% Variable distances changes size in every loop iteration. Future version
-% should implement a cell array.
 %
 % Input:
 %   maxDistance: maximum allowed distance to which distances are calculated in nm (default = 200)
-%   isRandom: true if random positons should be used
-%   showPlot: show histogram of NN distribution (default = true)
+%   isRandom: true if random positons should be used (default = false)
+%   showPlot: show histogram of distance distribution (default = false)
 % Output:
 %   (1) distances of all points
 %
-%   Note: if clustering with DBSCAN was done before, the function
-%   automatically calculates distances of all the points, of points
-%   within cluster and of the points outside of the cluster
+%   Note: If computations have already been carried out using DBSCAN, the function
+%   automatically calculates the distances of all the points, of points
+%   within the clusters and of the points outside of the clusters.
 %   Additional output:
-%   (2) nearest neighbor distances of points within clusters
-%   (3) nearest neighbor distances of points outside of clusters
+%   (2) pairwise distances of points within clusters
+%   (3) pairwise distances of points outside of clusters
 %
 %   Matlab 2014b or newer and Statistics and Machine Learning Toolbox
 %
-% Important when using histogram:
-% data are normalized to all distances from 0 to maxDistance
+% Note:
+% Histograms are normalized (according to all distances measured from zero to maxDistance).
 %
 % Jan Neumann, 13.07.2017
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% init
-isDBSCAN = false; % remembers if DBSCAN data already exist
+isDBSCAN = false; % flag, DBSCAN was carried out before
+supressWaitbar = false; % flag for waitbar
 switch nargin
     case 1
         maxDistance = 200;
@@ -75,7 +71,7 @@ if dataSize < 3*maxDistance
 end
 %% perform distance calculation
 imageSize = ceil(max(positions(:, 1:obj.dimension)));
-distances = distanceCalculation(positions, obj.dimension, imageSize, maxDistance);
+distances = distanceCalculation(positions, obj.dimension, imageSize, maxDistance, supressWaitbar);
 % distance calculation for points inside and outside of clusters
 if isDBSCAN == true
     % for outside points clusterAssignment is 0
@@ -85,19 +81,32 @@ if isDBSCAN == true
         [~, idx] = datasample(positions, numberOfSample);
         outerPositions = positions(idx, 1:obj.dimension);
     end
-    outerDistances = distanceCalculation(outerPositions, obj.dimension, imageSize, maxDistance);
+    outerDistances = distanceCalculation(outerPositions, obj.dimension, imageSize, maxDistance, supressWaitbar);
     % for points within clusters
     if any(clusterAssignment)
+        supressWaitbar = true;
         innerDistances = cell(1, max(clusterAssignment));
+        multiWaitbar('calculating distances...', 0);
+        % for waitbar
+        prevPercent = 0;
+        counter = 1;
         for kk = 1:max(clusterAssignment)
             tempCluster = clusterAssignment(:, 1) == kk;
             innerPositions = positions(tempCluster, 1:obj.dimension);
-            innerDistances{kk} = distanceCalculation(innerPositions, obj.dimension, imageSize, maxDistance);
+            innerDistances{kk} = distanceCalculation(innerPositions, obj.dimension, imageSize, maxDistance, supressWaitbar);
+            % waitbar
+            currentPercent = fix(100*counter/max(clusterAssignment));
+            if currentPercent > prevPercent
+                multiWaitbar( 'calculating distances...', 'Value', counter/double(max(clusterAssignment)));
+                prevPercent = currentPercent;
+            end
+            counter = counter + 1;
         end
         % remove empty cell arrays -> cluster had been outside the
         % boundary
         innerDistances = innerDistances(~cellfun('isempty',innerDistances));
         innerDistances = (cell2mat(innerDistances.'));
+        multiWaitbar('calculating distances...', 'Close');
     else
         innerDistances = 0;
     end
@@ -154,7 +163,7 @@ end
 end
 
 
-function dist = distanceCalculation(positions, dim, mapSize, maxDistance)
+function dist = distanceCalculation(positions, dim, mapSize, maxDistance, supressWaitbar)
 % re-sort points in such a way that boundary points are at the end of the
 % list
 if dim == 3
@@ -175,50 +184,34 @@ end
 % cell array for saving distances
 distanceCell = cell(1, size(currentPositions, 1));
 nDistanceCell = 1;
-multiWaitbar('calculating distances...', 0);
-% for waitbar
-prevPercent = 0;
-counter = 1;
+if supressWaitbar == false
+    multiWaitbar('calculating distances...', 0);
+    % for waitbar
+    prevPercent = 0;
+    counter = 1;
+end
 
 for ii = 1 : size(currentPositions, 1)
-    if dim == 3
-        % check if point is within the image border
-        if (positions(ii, 1) > maxDistance && positions(ii, 1) < mapSize(1)-maxDistance...
-                && positions(ii, 2) > maxDistance && positions(ii, 2) < mapSize(2)-maxDistance...
-                && positions(ii, 3) > maxDistance && positions(ii, 3) < mapSize(3) - maxDistance)
-            % calculate distance of current point to all other points that have
-            % not yet been visited
-            segment = positions(ii:end, :);
-            currentDistance = single(pdist2(segment(:, 1:3), positions(ii, 1:3)));
-            % removes distances larger then maxDistance
-            currentIdx = (currentDistance <= maxDistance & currentDistance > 0);
-            currentDistance = currentDistance(currentIdx);
-            distanceCell{nDistanceCell} = reshape(currentDistance, [], 1);
-            nDistanceCell = nDistanceCell + 1;
+    % calculate distance of current point to all other points that have
+    % not yet been visited
+    currentDistance = single(pdist2(positions(ii:end, 1:dim), positions(ii, 1:dim)));
+    % removes distances larger then maxDistance
+    currentIdx = (currentDistance <= maxDistance & currentDistance > 0);
+    currentDistance = currentDistance(currentIdx);
+    distanceCell{nDistanceCell} = reshape(currentDistance, [], 1);
+    nDistanceCell = nDistanceCell + 1;
+    if supressWaitbar == false
+        % waitbar
+        currentPercent = fix(100*counter/size(currentPositions, 1));
+        if currentPercent > prevPercent
+            multiWaitbar( 'calculating distances...', 'Value', counter/size(currentPositions, 1));
+            prevPercent = currentPercent;
         end
-    else
-        % check if point is within the image border
-        if (positions(ii, 1) > maxDistance && positions(ii, 1) < mapSize(1)-maxDistance...
-                && positions(ii, 2) > maxDistance && positions(ii, 2) < mapSize(2)-maxDistance)
-            % calculate distance of current point to all other points that have
-            % not yet been visited
-            segment = positions(ii:end, :);
-            currentDistance = single(pdist2(segment(:, 1:2), positions(ii, 1:2)));
-            % removes distances larger then maxDistance
-            currentIdx = (currentDistance <= maxDistance & currentDistance > 0);
-            currentDistance = currentDistance(currentIdx);
-            distanceCell{nDistanceCell} = reshape(currentDistance, [], 1);
-            nDistanceCell = nDistanceCell + 1;
-        end
+        counter = counter + 1;
     end
-    % waitbar
-    currentPercent = fix(100*counter/size(currentPositions, 1));
-    if currentPercent > prevPercent
-        multiWaitbar( 'calculating distances...', 'Value', counter/size(currentPositions, 1));
-        prevPercent = currentPercent;
-    end
-    counter = counter + 1;
 end
 dist = (cell2mat(distanceCell.'));
-multiWaitbar('calculating distances...', 'Close');
+if supressWaitbar == false
+    multiWaitbar('calculating distances...', 'Close');
+end
 end
