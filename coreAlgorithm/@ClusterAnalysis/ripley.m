@@ -34,6 +34,7 @@ if isRandom == true
     dataMat = obj.randomClusterStruct;
     nPoints = obj.randomNoOfPoints;
     treeData = obj.randomQueryData;
+    flagSearchTree = obj.flagSearchTreeRandomData;
     physicalDimension(1, :) = obj.randomPhysicalDimension(1, :);
     physicalDimension(2, :) = obj.randomPhysicalDimension(2, :);
     if obj.dimension == 3
@@ -44,6 +45,7 @@ else
     dataMat = obj.clusterStruct;
     nPoints = obj.NoOfPoints;
     treeData = obj.queryData;
+    flagSearchTree = obj.flagSearchTree;
     physicalDimension(1, :) = obj.physicalDimension(1, :);
     physicalDimension(2, :) = obj.physicalDimension(2, :);
     if obj.dimension == 3
@@ -85,21 +87,12 @@ for ii = 1:size(currentPositions, 1)
     % loop through all radii
     for ll = 1:size(binArray, 1)
         % get number of points within radii
-        switch obj.flagSearchTree
+        switch flagSearchTree
             case 'cTree'
-                if obj.dimension == 3
-                    radDistances = kdtree_ball_query(treeData, currentPositions(ii, 1:3), edges(ll + 1));
-                else
-                    radDistances = kdtree_ball_query(treeData, currentPositions(ii, 1:2), edges(ll + 1));
-                end
+                radDistances = kdtree_ball_query(treeData, currentPositions(ii, 1:obj.dimension), edges(ll + 1));
             case 'matlabTree'
-                if obj.dimension == 3
-                    distance = rangesearch(currentPositions(ii, 1:3), treeData.X, edges(ll + 1));
-                    radDistances = (find(~cellfun('isempty', distance))).';
-                else
-                    distance = rangesearch(currentPositions(ii, 1:2), treeData.X, edges(ll + 1));
-                    radDistances = (find(~cellfun('isempty', distance))).';
-                end
+                distance = rangesearch(currentPositions(ii, 1:obj.dimension), treeData.X, edges(ll + 1));
+                radDistances = (find(~cellfun('isempty', distance))).';
         end
         binArray(ll, 1) = binArray(ll, 1) + numel(radDistances) - 1; % sum up points within r, ignore current point
     end

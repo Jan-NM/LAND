@@ -45,6 +45,9 @@ switch visMethod
         SRimage = zeros(xSize, ySize, 'single');
         prevStep = minPrecision;
         steps = linspace(minPrecision, maxPrecision, nSteps);
+        if steps == 0
+            steps = 2 * pixelSize; % in case data does not contain localization precision
+        end
         steps(1) = [];
         for ii = steps
             % find points with specific loc prec.

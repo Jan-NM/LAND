@@ -4,7 +4,7 @@ function varargout = startClusterAnalysis(varargin)
 %   
 % Cremer Group, Institute of Molecular Biology (IMB), Mainz
 
-% Last Modified by GUIDE v2.5 20-Jul-2018 11:55:32
+% Last Modified by GUIDE v2.5 30-Apr-2019 11:27:15
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -238,14 +238,14 @@ end
 Clusterparamstruct.compareRandomData = get(handles.compareRandom, 'Value');
 if Clusterparamstruct.compareRandomData == 1
     Clusterparamstruct.randomAlgorithm = get(handles.CSR, 'Value');
-    end
     if get(handles.avgDensity, 'Value') == 1
         Clusterparamstruct.densityAlgorithm = 'averageDensity';
         Clusterparamstruct.randomAlgorithmValue = []; % should stey empty - parameter is not needed
     end
     if get(handles.kernelDensity, 'Value') == 1
         Clusterparamstruct.densityAlgorithm = 'kernelDensity';
-        Clusterparamstruct.randomAlgorithmValue = str2double(get(handles.kernelRadius, 'String'));
+        Clusterparamstruct.randomAlgorithmValue(1) = str2double(get(handles.sampDist, 'String'));
+        Clusterparamstruct.randomAlgorithmValue(2) = str2double(get(handles.gridSpacing, 'String'));
     end
     if get(handles.specValue, 'Value') == 1
         Clusterparamstruct.densityAlgorithm = 'specificValue';
@@ -510,14 +510,14 @@ if(get(hObject,'Value'))
      set(handles.avgDensity, 'Enable', 'on');
      set(handles.kernelDensity, 'Enable', 'on');
      set(handles.specValue, 'Enable', 'on');
-     set(handles.kernelRadius, 'Enable', 'on');
+     set(handles.sampDist, 'Enable', 'on');
      set(handles.randomValue, 'Enable', 'on');
 else
     set(handles.CSR, 'Enable', 'off');
     set(handles.avgDensity, 'Enable', 'off');
     set(handles.kernelDensity, 'Enable', 'off');
     set(handles.specValue, 'Enable', 'off');
-    set(handles.kernelRadius, 'Enable', 'off');
+    set(handles.sampDist, 'Enable', 'off');
     set(handles.randomValue, 'Enable', 'off');
 end
 % Hint: get(hObject,'Value') returns toggle state of compareRandom
@@ -748,18 +748,18 @@ set(handles.kernelDensity, 'Value', 0);
 % Hint: get(hObject,'Value') returns toggle state of specValue
 
 
-function kernelRadius_Callback(hObject, eventdata, handles)
-% hObject    handle to kernelRadius (see GCBO)
+function sampDist_Callback(hObject, eventdata, handles)
+% hObject    handle to sampDist (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of kernelRadius as text
-%        str2double(get(hObject,'String')) returns contents of kernelRadius as a double
+% Hints: get(hObject,'String') returns contents of sampDist as text
+%        str2double(get(hObject,'String')) returns contents of sampDist as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function kernelRadius_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to kernelRadius (see GCBO)
+function sampDist_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to sampDist (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -933,3 +933,26 @@ function ripley_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of ripley
+
+
+
+function gridSpacing_Callback(hObject, eventdata, handles)
+% hObject    handle to gridSpacing (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of gridSpacing as text
+%        str2double(get(hObject,'String')) returns contents of gridSpacing as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function gridSpacing_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to gridSpacing (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

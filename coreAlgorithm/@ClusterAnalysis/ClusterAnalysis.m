@@ -117,7 +117,8 @@ classdef ClusterAnalysis < handle
     end
     
     properties (Access = private, Hidden = true)
-       flagSearchTree 
+       flagSearchTree
+       flagSearchTreeRandomData
     end
         
     methods
@@ -407,11 +408,11 @@ classdef ClusterAnalysis < handle
                     y = obj.randomTable(:, 2);
                     z = obj.randomTable(:, 3);
                     obj.randomQueryData = kdtree_build([x y z]);
-                    obj.flagSearchTree = 'cTree';
+                    obj.flagSearchTreeRandomData = 'cTree';
                 catch
                     warning('Unable to create c++ based kdtree, using Matlab''s internal implementation.');
                     obj.randomQueryData = createns(obj.randomTable(:, 1:3));
-                    obj.flagSearchTree = 'matlabTree';
+                    obj.flagSearchTreeRandomData = 'matlabTree';
                 end
                 obj.randomPhysicalDimension = [max(obj.randomTable(:, 1)); max(obj.randomTable(:, 2));  max(obj.randomTable(:, 3))];
             else
@@ -419,11 +420,11 @@ classdef ClusterAnalysis < handle
                     x = obj.randomTable(:, 1);
                     y = obj.randomTable(:, 2);
                     obj.randomQueryData = kdtree_build([x y]);
-                    obj.flagSearchTree = 'cTree';
+                    obj.flagSearchTreeRandomData = 'cTree';
                 catch
                     warning('Unable to create c++ based kdtree, using Matlab''s internal implementation.');
                     obj.randomQueryData = createns(obj.randomTable(:, 1:2));
-                    obj.flagSearchTree = 'matlabTree';
+                    obj.flagSearchTreeRandomData = 'matlabTree';
                end
                 obj.randomPhysicalDimension = [max(obj.randomTable(:, 1)); max(obj.randomTable(:, 2)); 0];
             end

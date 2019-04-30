@@ -67,11 +67,13 @@ if isRandom == true
     dataMat = obj.randomClusterStruct;
     nPoints = obj.randomNoOfPoints;
     treeData = obj.randomQueryData;
+    flagSearchTree = obj.flagSearchTreeRandomData;
 else
     positions = obj.positionTable;
     dataMat = obj.clusterStruct;
     nPoints = obj.NoOfPoints;
     treeData = obj.queryData;
+    flagSearchTree = obj.flagSearchTree;
 end
 % initialize output fields of dataMat
 dataMat(1).clusterDBSCAN = [];
@@ -94,19 +96,11 @@ for ii = 1:nPoints
         continue
     end
     clusterAssignment(ii, 1) = -1; % point is visited
-    switch obj.flagSearchTree
+    switch flagSearchTree
         case 'cTree'
-            if obj.dimension == 3
-                distanceAppend = kdtree_ball_query(treeData, positions(ii, 1:3), radius);
-            else    
-                distanceAppend = kdtree_ball_query(treeData, positions(ii, 1:2), radius);
-            end
+            distanceAppend = kdtree_ball_query(treeData, positions(ii, 1:obj.dimension), radius);
         case 'matlabTree'
-            if obj.dimension == 3
-                distance = rangesearch(positions(ii, 1:3), treeData.X, radius);
-            else
-                distance = rangesearch(positions(ii, 1:2), treeData.X, radius);
-            end
+            distance = rangesearch(positions(ii, 1:obj.dimension), treeData.X, radius);
             distanceAppend = (find(~cellfun('isempty', distance))).';
     end
     if numel(distanceAppend) < minPoints + 1 % + 1 ignore current point
@@ -120,19 +114,11 @@ for ii = 1:nPoints
             indice = indice + 1;
             if clusterAssignment(ll, 1) == -2 % if point is not visited
                 clusterAssignment(ll, 1) = -1;
-                switch obj.flagSearchTree
+                switch flagSearchTree
                     case 'cTree'
-                        if obj.dimension == 3
-                            newAppend = kdtree_ball_query(treeData, positions(ll, 1:3), radius);
-                        else                            
-                            newAppend = kdtree_ball_query(treeData, positions(ll, 1:2), radius);
-                        end
+                        newAppend = kdtree_ball_query(treeData, positions(ll, 1:obj.dimension), radius);
                     case 'matlabTree'
-                        if obj.dimension == 3
-                            newDistance = rangesearch(positions(ll, 1:3), treeData.X, radius);
-                        else
-                            newDistance = rangesearch(positions(ll, 1:2), treeData.X, radius);
-                        end
+                        newDistance = rangesearch(positions(ll, 1:obj.dimension), treeData.X, radius);
                         newAppend = (find(~cellfun('isempty', newDistance))).';
                 end
                 if numel(newAppend) >= minPoints + 1 % + 1
@@ -181,8 +167,8 @@ for kk = 1:max(clusterAssignment)
     end
 end
 
-% filter cluster according to diamter and calcualte with remaining cluster additional properties
-if ~isempty(dataMat)
+% filter cluster according to diameter and calculate with remaining cluster additional properties
+if ~isempty(dataMat(2).clusterDBSCAN)
     % filter data
     deleteInd = [dataMat(2).clusterDBSCAN.Diameter] > maxDiameter;
     for ii = 1:size(dataMat(2).clusterDBSCAN, 2)

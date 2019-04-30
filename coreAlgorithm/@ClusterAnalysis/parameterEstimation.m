@@ -12,13 +12,9 @@ switch method
         treeData = obj.queryData;
         switch obj.flagSearchTree
             case 'cTree' % for knn search, use Matlab's internal function
-                if obj.dimension == 3
-                    [~, nnDistance] = knnsearch(positions(:, 1:3), positions(:, 1:3), 'K', 3);
-                else
-                    [~, nnDistance] = knnsearch(positions(:, 1:2), positions(:, 1:2), 'K', 3);
-                end
+                [~, nnDistance] = knnsearch(positions(:, 1:obj.dimension), positions(:, 1:obj.dimension), 'K', 2);
             case 'matlabTree'
-                [~, nnDistance] = knnsearch(treeData.X, treeData.X, 'K', 3);
+                [~, nnDistance] = knnsearch(treeData.X, treeData.X, 'K', 2);
         end
         nnDistances = mean(nnDistance(:, 2:end), 2);
         % plot histogram
@@ -36,13 +32,9 @@ switch method
         radius = str2double(radius{1});
         switch obj.flagSearchTree  % should be done on a cropped dataset for large position tables
             case 'cTree'
-                if obj.dimension == 3
-                    [~, distance] = rangesearch(positions(:, 1:3), positions(:, 1:3), radius);
-                else
-                    [~, distance] = rangesearch(positions(:, 1:2), positions(:, 1:2), radius);
-                end
+                [~, distance] = rangesearch(positions(:, 1:obj.dimension), positions(:, 1:obj.dimension), radius);
             case 'matlabTree'
-                [~, distance] = rangesearch(positions(:, 1:2), treeData.X, radius);
+                [~, distance] = rangesearch(positions(:, 1:obj.dimension), treeData.X, radius);
         end
         minPoints = cellfun('length', distance);
         subplot(2,2,2)
@@ -62,11 +54,7 @@ switch method
         % calculate k-NN distance
         switch obj.flagSearchTree
             case 'cTree' % for knn search, use Matlab's internal function
-                if obj.dimension == 3
-                    [~, nnDistance] = knnsearch(positions(:, 1:3), positions(:, 1:3), 'K', k);
-                else
-                    [~, nnDistance] = knnsearch(positions(:, 1:2), positions(:, 1:2), 'K', k);
-                end
+                [~, nnDistance] = knnsearch(positions(:, 1:obj.dimension), positions(:, 1:obj.dimension), 'K', k);
             case 'matlabTree'
                 [~, nnDistance] = knnsearch(treeData.X, treeData.X, 'K', k);
         end

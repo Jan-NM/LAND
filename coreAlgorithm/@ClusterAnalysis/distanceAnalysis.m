@@ -1,9 +1,9 @@
 function [] = distanceAnalysis(obj, maxDistance, isRandom, showPlot)
 %distanceAnalyses calculates pairwise distances
 %
-% Calculates pairwise distances between detected signals. Distances from points
-% that are locatred within maxDistance from the image border are not caluclated to
-% avoid edge effects.
+% Calculates pairwise distances between detected signals. To
+% avoid edge effects, distances from points that are located within 
+% maxDistance from the image border are not caluclated .
 %
 % Input:
 %   maxDistance: maximum allowed distance to which distances are calculated in nm (default = 200)
@@ -47,23 +47,19 @@ end
 if isRandom == true
     positions = obj.randomTable;
     dataMat = obj.randomClusterStruct;
+    dataSize = min(obj.randomPhysicalDimension(1:obj.dimension));
     if isfield(obj.randomClusterStruct, 'clusterDBSCAN')
         clusterAssignment = obj.randomClusterStruct(3).clusterDBSCAN;
-        numberOfSample = obj.clusterStruct(1).clusterDBSCAN;
         isDBSCAN = true;
     end
 else
     positions = obj.positionTable;
     dataMat = obj.clusterStruct;
+    dataSize = min(obj.physicalDimension(1:obj.dimension));
     if isfield(obj.clusterStruct, 'clusterDBSCAN')
         clusterAssignment = obj.clusterStruct(3).clusterDBSCAN;
         isDBSCAN = true;
     end
-end
-if isRandom == true
-    dataSize = min(obj.randomPhysicalDimension(1:obj.dimension));
-else
-    dataSize = min(obj.physicalDimension(1:obj.dimension));
 end
 if dataSize < 3*maxDistance
     disp('Image size is smaller then 3 times the cut-off distance! Try to decrease cut-off distance or increase image region.');
@@ -77,10 +73,6 @@ if isDBSCAN == true
     % for outside points clusterAssignment is 0
     tempCluster = clusterAssignment(:, 1) == 0;
     outerPositions = positions(tempCluster, 1:obj.dimension);
-    if isRandom == true
-        [~, idx] = datasample(positions, numberOfSample);
-        outerPositions = positions(idx, 1:obj.dimension);
-    end
     outerDistances = distanceCalculation(outerPositions, obj.dimension, imageSize, maxDistance, supressWaitbar);
     % for points within clusters
     if any(clusterAssignment)

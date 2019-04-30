@@ -64,6 +64,7 @@ if isRandom == true
     positions = obj.randomTable;
     dataMat = obj.randomClusterStruct;
     treeData = obj.randomQueryData;
+    flagSearchTree = obj.flagSearchTreeRandomData;
     if isfield(obj.randomClusterStruct, 'clusterDBSCAN')
         clusterAssignment = obj.randomClusterStruct(3).clusterDBSCAN;
         isDBSCAN = true;
@@ -72,6 +73,7 @@ else
     positions = obj.positionTable;
     dataMat = obj.clusterStruct;
     treeData = obj.queryData;
+    flagSearchTree = obj.flagSearchTree;
     if isfield(obj.clusterStruct, 'clusterDBSCAN')
         clusterAssignment = obj.clusterStruct(3).clusterDBSCAN;
         isDBSCAN = true;
@@ -88,13 +90,9 @@ if isDBSCAN == true
     dataMat(4).kNNDistance = [];
 end
 %% k-NN-calculation for all distances
-switch obj.flagSearchTree
+switch flagSearchTree
     case 'cTree' % for knn search, use Matlab's internal function
-        if obj.dimension == 3
-            [~, nnDistance] = knnsearch(positions(:, 1:3), positions(:, 1:3), 'K', k);
-        else
-            [~, nnDistance] = knnsearch(positions(:, 1:2), positions(:, 1:2), 'K', k);
-        end
+        [~, nnDistance] = knnsearch(positions(:, 1:obj.dimension), positions(:, 1:obj.dimension), 'K', k);
     case 'matlabTree'
         [~, nnDistance] = knnsearch(treeData.X, treeData.X, 'K', k);
 end
@@ -105,26 +103,16 @@ nnDistances = nnDistances(nnDistances(:, 1) <= maxDistance, :);
 if isDBSCAN == true
     % for points of clusters the clusterAssignment equals 0
     tempCluster = clusterAssignment(:, 1) == 0; % calculate NN distance outside of clusters
-    if obj.dimension == 3
-        outerPoints = positions(tempCluster, 1:3);
-        [~, outerNNDistance] = knnsearch(outerPoints(:, 1:3), outerPoints(:, 1:3), 'K', k);
-    else
-        outerPoints = positions(tempCluster, 1:2);
-        [~, outerNNDistance] = knnsearch(outerPoints(:, 1:2), outerPoints(:, 1:2), 'K', k);
-    end
+    outerPoints = positions(tempCluster, 1:obj.dimension);
+    [~, outerNNDistance] = knnsearch(outerPoints(:, 1:obj.dimension), outerPoints(:, 1:obj.dimension), 'K', k);
     outerNNDistance = mean(outerNNDistance(:, 2:end), 2);
     outerNNDistance = outerNNDistance(outerNNDistance(:, 1) <= maxDistance, :);
     innerNNDistance = []; % calculate NN distance within clusters
     if any(clusterAssignment)
         for kk = 1:max(clusterAssignment)
-            tempCluster = clusterAssignment(:, 1) == kk;
-            if obj.dimension == 3
-                innerPoints = positions(tempCluster, 1:3);
-                [~, tempInnerNNDistance] = knnsearch(innerPoints(:, 1:3), innerPoints(:, 1:3), 'K', k);
-            else
-                innerPoints = positions(tempCluster, 1:2);
-                [~, tempInnerNNDistance] = knnsearch(innerPoints(:, 1:2), innerPoints(:, 1:2), 'K', k);
-            end
+            tempCluster = clusterAssignment(:, 1) == kk; 
+            innerPoints = positions(tempCluster, 1:obj.dimension);
+            [~, tempInnerNNDistance] = knnsearch(innerPoints(:, 1:obj.dimension), innerPoints(:, 1:obj.dimension), 'K', k);
             currentInnerNNDistance = mean(tempInnerNNDistance(:, 2:end), 2);
             currentInnerNNDistance = currentInnerNNDistance(currentInnerNNDistance(:, 1) <= maxDistance, :);
             innerNNDistance = cat(1, innerNNDistance, currentInnerNNDistance);

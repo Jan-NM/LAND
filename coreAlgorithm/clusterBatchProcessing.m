@@ -104,12 +104,6 @@ for ii = 1:FILESmax
                 Clusterparamstruct.ripley.maxDistance, 1, Clusterparamstruct.showPlots);
             end
         end
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % grid analysis
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        if Clusterparamstruct.gridAna.algorithm == true
-            clusterData(ii).Analysis.gridAnalysis(10, 0);
-        end
     catch ME
         disp(['An error occured during evaluation of file: ' sampleID'.']);
         disp(getReport(ME,'extended'));
@@ -163,9 +157,11 @@ if Clusterparamstruct.kNNDistance.algorithm == true
     end
     % if DBSCAN was done before
     if isfield(clusterData(kk).Analysis.randomClusterStruct, 'clusterDBSCAN')
-        for kk=1:size(clusterData, 2)
-            totalInnerkNNDistanceRandom = [clusterData(kk).Analysis.randomClusterStruct(3).kNNDistance; totalInnerkNNDistanceRandom];
-            totalOuterkNNDistanceRandom = [clusterData(kk).Analysis.randomClusterStruct(4).kNNDistance; totalOuterkNNDistanceRandom];
+        if ~isempty(clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN)
+            for kk=1:size(clusterData, 2)
+                totalInnerkNNDistanceRandom = [clusterData(kk).Analysis.randomClusterStruct(3).kNNDistance; totalInnerkNNDistanceRandom];
+                totalOuterkNNDistanceRandom = [clusterData(kk).Analysis.randomClusterStruct(4).kNNDistance; totalOuterkNNDistanceRandom];
+            end
         end
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -194,51 +190,54 @@ if Clusterparamstruct.kNNDistance.algorithm == true
     
     % inner kNN distances
     if isfield(clusterData(kk).Analysis.clusterStruct, 'clusterDBSCAN')
-        h = figure( 'Name', 'kNN-Distance of points within a cluster' );
-        histogram(totalInnerkNNDistance, ceil(max(totalInnerkNNDistance(:, 1))), 'Normalization', 'probability');
-        hold on
-        if Clusterparamstruct.compareRandomData == true && isfield(clusterData(kk).Analysis.randomClusterStruct, 'clusterDBSCAN')
-            histogram(totalInnerkNNDistanceRandom, ceil(max(totalInnerkNNDistanceRandom(:, 1))), 'Normalization', 'probability');
+        if ~isempty(clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN)
+            h = figure( 'Name', 'kNN-Distance of points within a cluster' );
+            histogram(totalInnerkNNDistance, ceil(max(totalInnerkNNDistance(:, 1))), 'Normalization', 'probability');
+            hold on
+            if Clusterparamstruct.compareRandomData == true && isfield(clusterData(kk).Analysis.randomClusterStruct, 'clusterDBSCAN')
+                histogram(totalInnerkNNDistanceRandom, ceil(max(totalInnerkNNDistanceRandom(:, 1))), 'Normalization', 'probability');
+            end
+            grid on;
+            title([num2str(Clusterparamstruct.kNNDistance.k) '-Nearest Neighbor Distance of points within a cluster']);
+            xlabel('distance [nm]');
+            ylabel('normalized frequency');
+            if Clusterparamstruct.compareRandomData == true
+                legend(['mean k-NN-Distance = ' num2str(mean(totalInnerkNNDistance)) ' nm \pm ' num2str(std(totalInnerkNNDistance)) ' nm'],...
+                    ['mean k-NN-Distance = ' num2str(mean(totalInnerkNNDistanceRandom)) ' nm \pm ' num2str(std(totalInnerkNNDistanceRandom)) ' nm']);
+            else
+                legend(['mean k-NN-Distance = ' num2str(mean(totalInnerkNNDistance)) ' nm \pm ' num2str(std(totalInnerkNNDistance)) ' nm']);
+            end
+            ax = gca;
+            ax.XLim = [0 Clusterparamstruct.kNNDistance.maxDistance];
+            hold off
+            savefig(h, [Clusterparamstruct.DIR_output filesep 'innerkNNDistance.fig']);
         end
-        grid on;
-        title([num2str(Clusterparamstruct.kNNDistance.k) '-Nearest Neighbor Distance of points within a cluster']);
-        xlabel('distance [nm]');
-        ylabel('normalized frequency');
-        if Clusterparamstruct.compareRandomData == true
-            legend(['mean k-NN-Distance = ' num2str(mean(totalInnerkNNDistance)) ' nm \pm ' num2str(std(totalInnerkNNDistance)) ' nm'],...
-                ['mean k-NN-Distance = ' num2str(mean(totalInnerkNNDistanceRandom)) ' nm \pm ' num2str(std(totalInnerkNNDistanceRandom)) ' nm']);
-        else
-            legend(['mean k-NN-Distance = ' num2str(mean(totalInnerkNNDistance)) ' nm \pm ' num2str(std(totalInnerkNNDistance)) ' nm']);
-        end    
-        ax = gca;
-        ax.XLim = [0 Clusterparamstruct.kNNDistance.maxDistance];
-        hold off
-        savefig(h, [Clusterparamstruct.DIR_output filesep 'innerkNNDistance.fig']);
     end
     % outer kNNdistances
     if isfield(clusterData(kk).Analysis.clusterStruct, 'clusterDBSCAN')
-        h = figure( 'Name', 'kNN-Distance of points outside a cluster' );
-        histogram(totalOuterkNNDistance, ceil(max(totalOuterkNNDistance(:, 1))), 'Normalization', 'probability');
-        hold on
-        if Clusterparamstruct.compareRandomData == true && isfield(clusterData(kk).Analysis.randomClusterStruct, 'clusterDBSCAN')
-            histogram(totalOuterkNNDistanceRandom, ceil(max(totalOuterkNNDistanceRandom(:, 1))), 'Normalization', 'probability');
+        if ~isempty(clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN)
+            h = figure( 'Name', 'kNN-Distance of points outside a cluster' );
+            histogram(totalOuterkNNDistance, ceil(max(totalOuterkNNDistance(:, 1))), 'Normalization', 'probability');
+            hold on
+            if Clusterparamstruct.compareRandomData == true && isfield(clusterData(kk).Analysis.randomClusterStruct, 'clusterDBSCAN')
+                histogram(totalOuterkNNDistanceRandom, ceil(max(totalOuterkNNDistanceRandom(:, 1))), 'Normalization', 'probability');
+            end
+            grid on;
+            title([num2str(Clusterparamstruct.kNNDistance.k) '-Nearest Neighbor Distance of points outside a cluster']);
+            xlabel('distance [nm]');
+            ylabel('normalized frequency');
+            if Clusterparamstruct.compareRandomData == true
+                legend(['mean k-NN-Distance = ' num2str(mean(totalOuterkNNDistance)) ' nm \pm ' num2str(std(totalOuterkNNDistance)) ' nm'],...
+                    ['mean k-NN-Distance = ' num2str(mean(totalOuterkNNDistanceRandom)) ' nm \pm ' num2str(std(totalOuterkNNDistanceRandom)) ' nm']);
+            else
+                legend(['mean k-NN-Distance = ' num2str(mean(totalOuterkNNDistance)) ' nm \pm ' num2str(std(totalOuterkNNDistance)) ' nm']);
+            end
+            ax = gca;
+            ax.XLim = [0 Clusterparamstruct.kNNDistance.maxDistance];
+            hold off
+            savefig(h, [Clusterparamstruct.DIR_output filesep 'outerkNNDistance.fig']);
         end
-        grid on;
-        title([num2str(Clusterparamstruct.kNNDistance.k) '-Nearest Neighbor Distance of points outside a cluster']);
-        xlabel('distance [nm]');
-        ylabel('normalized frequency');
-        if Clusterparamstruct.compareRandomData == true
-            legend(['mean k-NN-Distance = ' num2str(mean(totalOuterkNNDistance)) ' nm \pm ' num2str(std(totalOuterkNNDistance)) ' nm'],...
-                ['mean k-NN-Distance = ' num2str(mean(totalOuterkNNDistanceRandom)) ' nm \pm ' num2str(std(totalOuterkNNDistanceRandom)) ' nm']);
-        else
-            legend(['mean k-NN-Distance = ' num2str(mean(totalOuterkNNDistance)) ' nm \pm ' num2str(std(totalOuterkNNDistance)) ' nm']);
-        end    
-        ax = gca;
-        ax.XLim = [0 Clusterparamstruct.kNNDistance.maxDistance];
-        hold off
-        savefig(h, [Clusterparamstruct.DIR_output filesep 'outerkNNDistance.fig']);
     end
-    
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DBSCAN algorithm
@@ -448,7 +447,9 @@ if Clusterparamstruct.Distance.algorithm == true
         histogram(totalInnerDistance, ceil(max(totalInnerDistance(:, 1))), 'Normalization', 'probability');
         hold on
         if Clusterparamstruct.compareRandomData == true && isfield(clusterData(kk).Analysis.randomClusterStruct, 'clusterDBSCAN')
-            histogram(totalInnerDistanceRandom, ceil(max(totalInnerDistanceRandom(:, 1))), 'Normalization', 'probability');
+            if ~isempty(clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN)
+                histogram(totalInnerDistanceRandom, ceil(max(totalInnerDistanceRandom(:, 1))), 'Normalization', 'probability');
+            end
         end
         grid on;
         title('Distance Analysis of points within a cluster');
@@ -471,7 +472,9 @@ if Clusterparamstruct.Distance.algorithm == true
         histogram(totalOuterDistance, ceil(max(totalOuterDistance(:, 1))), 'Normalization', 'probability');
         hold on
         if Clusterparamstruct.compareRandomData == true && isfield(clusterData(kk).Analysis.randomClusterStruct, 'clusterDBSCAN')
-            histogram(totalOuterDistanceRandom, ceil(max(totalOuterDistanceRandom(:, 1))), 'Normalization', 'probability');
+            if ~isempty(clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN)
+                histogram(totalOuterDistanceRandom, ceil(max(totalOuterDistanceRandom(:, 1))), 'Normalization', 'probability');
+            end
         end
         grid on;
         title('Distance Analysis of points outside a cluster');
