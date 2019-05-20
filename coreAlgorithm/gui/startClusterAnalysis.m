@@ -477,7 +477,7 @@ function helpbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to helpbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-winopen('ILAND_manual.pdf');
+winopen('help/LAND_manual.pdf');
 
 
 % --- Executes on button press in twoDim.
