@@ -40,6 +40,10 @@ function [] = DBSCAN(obj, radius, minPoints, isRandom, maxDiameter, showImage)
 visMethod = 'gaussianBlur'; % alternative: 'histogramBinning'
 visPixelsize = 10;
 %% init
+if nargin < 3
+    warning("You have to specify at least the following parameters for DBSCAN: radius, minimum number of points.")
+    return
+end
 switch nargin
     case 3
         isRandom = 0;

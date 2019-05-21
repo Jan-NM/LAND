@@ -1,4 +1,26 @@
-%% for 3D
+function [Orte] = sim3Dclusters(parameters, varargin)
+%sim3Dclusters simulates 3D clusters
+%
+%   Input:  parameters      options: 'default' uses default parameters
+%                                    'non-default' uses user-supplied
+%                                    parameters
+%           If 'non-default' is specified, the user must supply the
+%           following parameters: (1) image size in nm, (2) density of points
+%           in 1/µm² over entire image, (3) density of cluster in 1/µm²
+%           over entire image, (4) fraction of points within clusters,
+%           (5) diameter of cluster in nm
+%           example: simulatedTable = simClusters('non-default', 1000, 50000, 5, 0.8, 100)           
+%
+%   Output: list of localizations. Localization table should be in Orte file format i.e. 
+%           column 2/3 = x/y-position, column 3/5 = x/y-localization precision,
+%           column 9 = frame number.
+%
+%   Note: Points of clusters that are located outside the image border are
+%   removed.
+%
+% Jan Neumann, 21.05.2019
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% init 
 imageSize = 3000; % image size in nm
 density = 150; % density of points in 1/µm² over entire image
 densityCluster = 5; % density of cluster in 1/µm² over entire image
@@ -73,3 +95,5 @@ y = Orte(:, 3);
 z = Orte(:, 11);
 scatter3(x,y,z,'.')
 axis equal vis3d
+end
+

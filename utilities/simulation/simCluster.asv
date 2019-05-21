@@ -24,7 +24,7 @@ function [Orte] = simCluster(parameters, dim, varargin)
 % Jan Neumann, 19.11.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% init parameters
-narginchk(2, 9);
+narginchk(2, 8);
 switch parameters
     case 'default'
         imageSize = 20000; % image size in nm
@@ -114,22 +114,17 @@ if dim == 2
     coordinates = [xPoints, yPoints];
     coordinates = coordinates(coordinates(:, 1) > 0 & coordinates(:, 1) < imageSize & coordinates(:, 2) > 0 & coordinates(:, 2) < imageSize, :);
 else
-    coordinates = [xPoints, yPoints, zPoints];
-    coordinates = coordinates(coordinates(:, 1) > 0 & coordinates(:, 1) < imageSize &...
-        coordinates(:, 2) > 0 & coordinates(:, 2) < imageSize & coordinates(:, 3) > 0 & coordinates(:, 3) < imageSize, :);
+    coordinates = [xPoints, yPoints, ];
+    coordinates = coordinates(coordinates(:, 1) > 0 & coordinates(:, 1) < imageSize & coordinates(:, 2) > 0 & coordinates(:, 2) < imageSize, :);
 end
     % pre-allocate Orte matrix for non-clustered points
 clusteredPoints = size(coordinates, 1);
-clusterOrte = zeros(clusteredPoints, 12);
+clusterOrte = zeros(clusteredPoints, 9);
 
 clusterOrte(:, 2) = coordinates(:, 1);
 clusterOrte(:, 3) = coordinates(:, 2);
 clusterOrte(:, 4) = abs(normrnd(meanLoc, stdLoc, [clusteredPoints 1]));
 clusterOrte(:, 5) = clusterOrte(:, 4);
-if dim == 3
-    clusterOrte(:, 11) = coordinates(:, 3);
-    clusterOrte(:, 12) = clusterOrte(:, 4);
-end
 %% combine both Orte files
 Orte = cat(1, nonClusterOrte, clusterOrte);
 end

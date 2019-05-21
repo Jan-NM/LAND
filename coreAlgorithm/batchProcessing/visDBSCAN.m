@@ -15,22 +15,26 @@ if Clusterparamstruct.DBSCAN.algorithm == true
     % measure number of clusters
     for kk=1:nSamples
         if size(clusterData(kk).Analysis.clusterStruct(2).clusterDBSCAN, 2) ~= 0
-            totalSignalsPerCluster{kk} = clusterData(kk).Analysis.clusterStruct(2).clusterDBSCAN.Molecules;
-            totalDiameter{kk} = clusterData(kk).Analysis.clusterStruct(2).clusterDBSCAN.Diameter;
-            totalDensity{kk} = clusterData(kk).Analysis.clusterStruct(2).clusterDBSCAN.ClusterDensity;
-            if isfield(clusterData(kk).Analysis.clusterStruct(2).clusterDBSCAN, 'NNCluster')% image consists of more then one cluster
-                totalNNDistance{kk} = clusterData(kk).Analysis.clusterStruct(2).clusterDBSCAN.NNCluster;
+            for ii=1:size(clusterData(kk).Analysis.clusterStruct(2).clusterDBSCAN, 2)
+                totalSignalsPerCluster{kk} = cat(2, clusterData(kk).Analysis.clusterStruct(2).clusterDBSCAN(ii).Molecules, totalSignalsPerCluster{kk});
+                totalDiameter{kk} = cat(2, clusterData(kk).Analysis.clusterStruct(2).clusterDBSCAN(ii).Diameter, totalDiameter{kk});
+                totalDensity{kk} = cat(2, clusterData(kk).Analysis.clusterStruct(2).clusterDBSCAN(ii).ClusterDensity, totalDensity{kk});
+                if isfield(clusterData(kk).Analysis.clusterStruct(2).clusterDBSCAN, 'NNCluster')% image consists of more then one cluster
+                    totalNNDistance{kk} = cat(2, clusterData(kk).Analysis.clusterStruct(2).clusterDBSCAN(ii).NNCluster, totalNNDistance{kk});
+                end
             end
         end
     end
     if Clusterparamstruct.compareRandomData == true
         for kk=1:nSamples
             if size(clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN, 2) ~= 0
-                totalSignalsPerClusterRandom{kk} = clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN.Molecules;
-                totalDiameterRandom{kk} = clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN.Diameter;
-                totalDensityRandom{kk} = clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN.ClusterDensity;
-                if isfield(clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN, 'NNCluster')% image consists of more then one cluster
-                    totalNNDistanceRandom{kk} = clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN.NNCluster;
+                for ii=1:size(clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN, 2)
+                    totalSignalsPerClusterRandom{kk} = cat(2, clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN(ii).Molecules, totalSignalsPerClusterRandom{kk});
+                    totalDiameterRandom{kk} = cat(2, clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN(ii).Diameter, totalDiameterRandom{kk});
+                    totalDensityRandom{kk} = cat(2, clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN(ii).ClusterDensity, totalDensityRandom{kk});
+                    if isfield(clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN, 'NNCluster')% image consists of more then one cluster
+                        totalNNDistanceRandom{kk} = cat(2, clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN(ii).NNCluster, totalNNDistanceRandom{kk});
+                    end
                 end
             end
         end

@@ -512,6 +512,9 @@ if(get(hObject,'Value'))
      set(handles.specValue, 'Enable', 'on');
      set(handles.sampDist, 'Enable', 'on');
      set(handles.randomValue, 'Enable', 'on');
+     set(handles.gridSpacing, 'Enable', 'on');
+     set(handles.text80, 'Enable', 'on');
+     set(handles.text81, 'Enable', 'on');
 else
     set(handles.CSR, 'Enable', 'off');
     set(handles.avgDensity, 'Enable', 'off');
@@ -519,6 +522,9 @@ else
     set(handles.specValue, 'Enable', 'off');
     set(handles.sampDist, 'Enable', 'off');
     set(handles.randomValue, 'Enable', 'off');
+    set(handles.gridSpacing, 'Enable', 'off')
+    set(handles.text80, 'Enable', 'off');
+    set(handles.text81, 'Enable', 'off');
 end
 % Hint: get(hObject,'Value') returns toggle state of compareRandom
 
