@@ -4,7 +4,7 @@ LAND is a software package for Matlab that enables quantitative 2D and 3D analys
 
 ## Getting Started
 
-The follwong sections describe how to get a copy of the software and how to install it on your local machine. Detailed instructions on how to use the software including examples can be found in the manual [LAND_manual.pdf](LAND_manual.pdf).
+The follwong sections describe how to get a copy of the software and how to install it on your local machine. Detailed instructions on how to use the software including examples can be found in the manual [LAND_manual.pdf](help/LAND_manual.pdf).
 
 ### Requirements
 
@@ -49,7 +49,7 @@ The following description is for Windows machines:
 
 * to use LAND, right click on ILAND-master in Matlab's current folder panel, go to "*Add to Path*" and click on "*Selected Folders and Subfolders*"
 
-LAND can be used via the command window or by opening the user interface. To open the user interface type "*startClusterAnalysis*" in the command window. Detailed instructions on how to use the software including examples can be found in the manual [LAND_manual.pdf](ILAND_manual.pdf).
+LAND can be used via the command window or by opening the user interface. To open the user interface type "*startClusterAnalysis*" in the command window. Detailed instructions on how to use the software including examples can be found in the manual [LAND_manual.pdf](help/ILAND_manual.pdf).
 
 ## License
 
