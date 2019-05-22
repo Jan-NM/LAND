@@ -443,7 +443,7 @@ classdef ClusterAnalysis < handle
             catch
             end
         end
-        % implemented cluster algorithms
+        % implemented algorithms
         [varargout] = DBSCAN(obj, radius, minPoints, isRandom, maxDiameter, showImage)
         
         [varargout] = kNNDistance(obj, k, isRandom, maxDistance, showPlot)
@@ -456,16 +456,6 @@ classdef ClusterAnalysis < handle
         
         [varargout] = parameterEstimation(obj, method)
         
-        [varargout] = scatterPlot(obj)
-                
-        % algorithms based on distance matrix calculation (2D only); dependent on
-        % input data, these calculations are memory intensive; remove
-        % comments to use them; 
-        
-        % [varargout] = DBSCANdistanceMatrix(obj, radius, minPoints, isRandom, maxDiameter, showImage)
-        % [varargout] = radialDensityFunctionDistanceMatrix(obj, binSize,  maxRadius, isRandom, showImage)
-        % [varargout] = ripleyDistanceMatrix(obj, samplingDistance,  maxRadius, isRandom, showImage)
-        % [varargout] = distanceAnalysisGridBased(obj, maxDistance, isRandom, showPlot)
-        
+        [varargout] = scatterPlot(obj)        
     end
 end
