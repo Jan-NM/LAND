@@ -1,6 +1,8 @@
 function visDBSCAN(Clusterparamstruct, clusterData)
 %visDBSCAN Summary of this function goes here
 %   Detailed explanation goes here
+% integrate structfun
+% integrate plotting func
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if Clusterparamstruct.DBSCAN.algorithm == true
     nSamples = size(clusterData, 2);
