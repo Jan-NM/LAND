@@ -11,9 +11,9 @@ classdef ClusterAnalysis < handle
 % errors due to missing localization precisions could be to use an average
 % localization precision as calculated by nearest neighbor based analysis
 % (Ulrike Endesfelder, Sebastian Malkusch, Franziska Fricke, and Mike Heilemann (June
-% 2014). “A simple method to estimate the average localization precision of a single-molecule
-% localization microscopy experiment.” In: Histochem. Cell Biol. 141.6,
-% pp. 629–38. ISSN: 1432-119X. DOI: 10.1007/s00418- 014- 1192- 3) for example.
+% 2014). ï¿½A simple method to estimate the average localization precision of a single-molecule
+% localization microscopy experiment.ï¿½ In: Histochem. Cell Biol. 141.6,
+% pp. 629ï¿½38. ISSN: 1432-119X. DOI: 10.1007/s00418- 014- 1192- 3) for example.
 %
 % To create an instance of this class call:
 %
@@ -322,9 +322,9 @@ classdef ClusterAnalysis < handle
             switch randomAlgorithm
                 case 'averageDensity'
                     if obj.dimension == 3
-                        obj.localDensity = obj.NoOfPoints / (obj.physicalDimension(1, 1)/1000 * obj.physicalDimension(2, 1)/1000 * obj.physicalDimension(3, 1)/1000); % in µm^3
+                        obj.localDensity = obj.NoOfPoints / (obj.physicalDimension(1, 1)/1000 * obj.physicalDimension(2, 1)/1000 * obj.physicalDimension(3, 1)/1000); % in ï¿½m^3
                     else
-                        obj.localDensity = obj.NoOfPoints / (obj.physicalDimension(1, 1)/1000 * obj.physicalDimension(2, 1)/1000); % in µm^2
+                        obj.localDensity = obj.NoOfPoints / (obj.physicalDimension(1, 1)/1000 * obj.physicalDimension(2, 1)/1000); % in ï¿½m^2
                     end
                 case 'kernelDensity'
                     multiWaitbar('calculating kernel density...', 'Busy');  
@@ -341,7 +341,7 @@ classdef ClusterAnalysis < handle
                         xi = [x1 x2 x3];
                         bw = obj.NoOfPoints * (-1 / (obj.dimension + 4)); % bandwidth is estimated by Scott's rule
                         KDEestimate = mvksdensity(obj.positionTable(:, 1:3), xi, 'Bandwidth', bw);
-                        % transform KDEestimate into density per µm²
+                        % transform KDEestimate into density per ï¿½mï¿½
                         x = linspace(min(x1), max(x1), xGridSpace);
                         y = linspace(min(x2), max(x2), yGridSpace);
                         z = linspace(min(x3), max(x3), zGridSpace);
@@ -358,7 +358,7 @@ classdef ClusterAnalysis < handle
                         x2 = x2(:);
                         xi = [x1 x2];
                         KDEestimate = ksdensity(obj.positionTable(:, 1:2), xi);
-                        % transform z from nm into density per µm²
+                        % transform z from nm into density per ï¿½mï¿½
                         x = linspace(min(x1), max(x1), xGridSpace);
                         y = linspace(min(x2), max(x2), yGridSpace);
                         KDEestimate = KDEestimate * randomAlgorithmValue(1).^2;
@@ -374,9 +374,9 @@ classdef ClusterAnalysis < handle
             if assumeCSR == true
                 % create CSR with estimated localDensity
                 if obj.dimension == 3
-                    nPoints = poissrnd(obj.localDensity*obj.physicalDimension(1, 1)/1000*obj.physicalDimension(2, 1)/1000*obj.physicalDimension(3, 1)/1000); % 1000 because localDensity is in µm^3 
+                    nPoints = poissrnd(obj.localDensity*obj.physicalDimension(1, 1)/1000*obj.physicalDimension(2, 1)/1000*obj.physicalDimension(3, 1)/1000); % 1000 because localDensity is in ï¿½m^3 
                 else
-                    nPoints = poissrnd(obj.localDensity*obj.physicalDimension(1, 1)/1000*obj.physicalDimension(2, 1)/1000); % 1000 because localDensity is in µm^2 
+                    nPoints = poissrnd(obj.localDensity*obj.physicalDimension(1, 1)/1000*obj.physicalDimension(2, 1)/1000); % 1000 because localDensity is in ï¿½m^2 
                 end
                 obj.randomTable = zeros(nPoints, 6, 'double');
                 obj.randomNoOfPoints = nPoints;
@@ -453,6 +453,8 @@ classdef ClusterAnalysis < handle
         [varargout] = ripley(obj, samplingDistance,  maxRadius, isRandom, showImage)
         
         [varargout] = distanceAnalysis(obj, maxDistance, isRandom, showPlot)
+        
+        [varargout] = voronoiCluster( obj, isRandom, showImage )
         
         [varargout] = parameterEstimation(obj, method)
         

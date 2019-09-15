@@ -8,7 +8,7 @@ function [Orte] = simCluster(parameters, dim, varargin)
 %           dim             2 or 3 for 2D or 3D simulation
 %           If 'non-default' is specified, the user must supply the
 %           following parameters: (1) image size in nm, (2) density of points
-%           in 1/µm² over entire image, (3) density of cluster in 1/µm²
+%           in 1/ï¿½mï¿½ over entire image, (3) density of cluster in 1/ï¿½mï¿½
 %           over entire image, (4) fraction of points within clusters,
 %           (5) diameter of cluster in nm, (6) mean localization precision
 %           in nm, (6) standard deviation of localization precision in nm
@@ -28,8 +28,8 @@ narginchk(2, 9);
 switch parameters
     case 'default'
         imageSize = 20000; % image size in nm
-        density = 100; % density of points in 1/µm² over entire image
-        densityCluster = 5; % density of cluster in 1/µm² over entire image
+        density = 10; % density of points in 1/ï¿½mï¿½ over entire image
+        densityCluster = 5; % density of cluster in 1/ï¿½mï¿½ over entire image
         clusterPoints = 0.7; % fraction of points within clusters
         clusterSize = 60; % diameter of cluster in nm;
         meanLoc = 9;
@@ -47,7 +47,7 @@ switch parameters
 end
 %% calculate parameters
 if dim == 2
-    imageDim = imageSize/1000*imageSize/1000; % 1000 because localDensity is in µm^2
+    imageDim = imageSize/1000*imageSize/1000; % 1000 because localDensity is in ï¿½m^2
 else
     imageDim = imageSize/1000*imageSize/1000*imageSize/1000;
 end    
