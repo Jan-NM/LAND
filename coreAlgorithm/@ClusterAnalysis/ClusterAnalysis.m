@@ -62,6 +62,8 @@ classdef ClusterAnalysis < handle
 %
 %   ripley's function - 2D + 3D
 %
+%   compaction parameter - 2D only
+%
 %   parameter estimation for DBSCAN
 %
 %   plotting of data (scatterplot) - 2D + 3D
@@ -453,6 +455,8 @@ classdef ClusterAnalysis < handle
         [varargout] = ripley(obj, samplingDistance,  maxRadius, isRandom, showImage)
         
         [varargout] = distanceAnalysis(obj, maxDistance, isRandom, showPlot)
+        
+        [varargout] = compactionParameter(obj, varargin)
         
         [varargout] = parameterEstimation(obj, method)
         
