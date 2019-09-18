@@ -1,7 +1,7 @@
 function [] = compactionParameter(obj, varargin)
 %compactionParameter determines chromatin compaction of nuclei in
 %                    localization microscopy images
-% 
+%
 % The algorithm is based on Irianto et al.: "Quantification of chromatin
 % condensation level by image processing", Med. Eng. Phys., (2014).
 %
@@ -99,6 +99,22 @@ for ii = 1:nObjects.NumObjects
 end
 %% plot image
 if plotOverlay == true
+    visImage(sobelImage, innerNuclei, PixRedFactor, positions, binSize);
+end
+%% output
+dataMat(1).compactionParameter = result;
+if isRandom == true
+    obj.randomClusterStruct = dataMat;
+else
+    obj.clusterStruct = dataMat;
+end
+end
+
+
+
+
+%% plotting function
+function visImage(sobelImage, innerNuclei, PixRedFactor, positions, binSize)
     edgeImage = uint8(immultiply(sobelImage, innerNuclei))*255;
     edgeImage = imresize(edgeImage, PixRedFactor);
     SRimage = visModuleCluster(positions, 'gaussianBlur', binSize);
@@ -112,12 +128,4 @@ if plotOverlay == true
     subplot(1, 3, 3)
     imshowpair(imadjust(uint8(SRimage)), imadjust(edgeImage), 'falsecolor')
     title('Overlay')
-end
-%% output
-dataMat(1).compactionParameter = result;
-if isRandom == true
-    obj.randomClusterStruct = dataMat;
-else
-    obj.clusterStruct = dataMat;
-end
 end
