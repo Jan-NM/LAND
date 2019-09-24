@@ -249,7 +249,7 @@ if showImage || saveImage
         zlim([zmin,zmax])
         zlabel("z in nm")
     end
-    set(gca,'Color','k')
+    set(gca,'Color',"black")
     if dim == 2
         title({"Voronoi diagram"; "Blue -> Yellow (range: 0.5% - 99.5%)"})
     else 
@@ -261,6 +261,7 @@ if showImage || saveImage
     c.Label.String = "Density";
     c.Limits = [lowest_plot_density highest_plot_density];
     if saveImage
+        set(gcf, 'InvertHardCopy', 'off');
         saveas(f, saveImageFolder+"/"+saveImageFilename+"_voronoi", "png");
     end
 end
