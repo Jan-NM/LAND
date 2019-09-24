@@ -79,7 +79,7 @@ end
 %% for each region check if inside
 for i = 1:length(R)
     reasonable = true;
-    for jxy=V(R{i},:)
+    for jxy=V(R{i},:)'
         if jxy(1) <= xmin || jxy(1) >= xmax || jxy(2) <= ymin || jxy(2) >= ymax
             reasonable = false;
             break
@@ -211,12 +211,15 @@ if showImage || saveImage
     for i=1:length(R)
         if reasonables(i)
            cmap_row = floor(size(cmap, 1)*((1/A(j)-lowest_plot_density)/(highest_plot_density-lowest_plot_density)))+1;
+            
+        
            if cmap_row >= size(cmap, 1)+1
-               cmap_row = size(cmap, 1);
+                cmap_row = size(cmap, 1);
            end
-           color = [0 0 0];
+           color = "black";
            if cmap_row > 0
-              color = cmap(cmap_row,:);
+                color = cmap(cmap_row,:);
+           end
            end
            if dim == 2
                 h = fill(V(R{i},1),V(R{i},2), color);
