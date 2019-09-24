@@ -454,7 +454,7 @@ classdef ClusterAnalysis < handle
         
         [varargout] = distanceAnalysis(obj, maxDistance, isRandom, showPlot)
         
-        [varargout] = voronoiCluster( obj, isRandom, showImage )
+        [varargout] = voronoiCluster( obj, isRandom, dim, showImage, saveImageFolder, saveImageFilename)
         
         [varargout] = parameterEstimation(obj, method)
         
