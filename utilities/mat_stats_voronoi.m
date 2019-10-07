@@ -2,16 +2,16 @@
 %% write the result to a csv file
 
 % d = uigetdir(pwd, 'Select a folder');
-d = "/home/ole/Hiwi/Data/Mohan_filtered/Sperm/PDC/filtered/cropped";
-out_dir = "/home/ole/Hiwi/matlab_plots/Mohan/PDC";
+d = "/home/ole/Hiwi/Data/Mohan_filtered/Sperm/UDC/filtered";
+out_dir = "/home/ole/Hiwi/matlab_plots/Mohan/UDC";
 disp(d)
-files = dir(fullfile(d, '*cropped.mat'));
+files = dir(fullfile(d, '*GSD024_cropped.mat'));
 
 filenames = {files(:).name};
 
 dims = 2;
 
-fid_out = fopen('stats_mohan_PDC.csv','w'); 
+fid_out = fopen('stats_mohan_UDC_new.csv','w'); 
 fprintf(fid_out,'%s,%s,%s,%s,%s,%s\n', 'path', 'filename','smallest_area','biggest_area','0.5% quant density', '99.5% quant density');
 
 for k = 1 : length(filenames)
