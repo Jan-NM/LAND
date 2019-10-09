@@ -170,7 +170,7 @@ if showImage || saveImage
     end
     histogram(micro_densities,40)
     set(gca,'yscale','log')
-    title({"Density histogram"; title_class})
+    title({"Density histogram"; "Type: "+title_class+", #voronoi cells: "+length(micro_densities)})
     xlabel("Density in μm^{-"+dim+"}")
     ylabel("Number of voronoi cells")
     if saveImage
@@ -184,7 +184,7 @@ if showImage || saveImage
     end
     histogram(mdensities_range,40)
     set(gca,'yscale','log')
-    title({"Density histogram 0.5% - 99.5%"l title_class})
+    title({"Density histogram 0.5% - 99.5%"; "Type: "+title_class+", #voronoi cells: "+length(mdensities_range)})
     xlabel("Density in μm^{-"+dim+"}")
     ylabel("Number of voronoi cells")
     if saveImage
@@ -201,7 +201,7 @@ if showImage || saveImage
     end
     [yvals,xvals] = ecdf(micro_densities);
     semilogx(xvals,yvals,'-r')
-    title({"Cumulative density plot"; title_class})
+    title({"Cumulative density plot"; "Type: "+title_class})
     ylabel("Cumulative fraction")
     xlabel("Voronoi density in μm^{-"+dim+"}")
     if saveImage
@@ -218,7 +218,7 @@ if showImage || saveImage
     bar(bins, contents, 1)
     xlabel(area_or_vol+" in μm^{"+dim+"}")
     ylabel("Cumulative area of voronoi cells")
-    title({area_or_vol+" histogram"; title_class})
+    title({area_or_vol+" histogram"; "Type: "+title_class+", Total "+area_or_vol+": "+sprintf("%.1f", sum(micro_area))+"μm^{"+dim+"}"})
     
     if saveImage
         saveas(f, saveImageFolder+"/"+saveImageFilename+"_"+area_or_vol+"_histo_cum", "png");
@@ -233,7 +233,7 @@ if showImage || saveImage
     set(gca,'yscale','log')
     xlabel(area_or_vol+" in μm^{"+dim+"}")
     ylabel("Number of voronoi cells")
-    title({area_or_vol+" histogram"; title_class})
+    title({area_or_vol+" histogram"; "Type: "+title_class+", #voronoi cells: "+length(micro_area)})
     
     if saveImage
         saveas(f, saveImageFolder+"/"+saveImageFilename+"_"+area_or_vol+"_histo", "png");
@@ -248,7 +248,7 @@ if showImage || saveImage
     set(gca,'yscale','log')
     xlabel(area_or_vol+" in μm^{"+dim+"}")
     ylabel("Number of voronoi cells")
-    title({area_or_vol+" histogram 0.5% - 99.5%"; title_class})
+    title({area_or_vol+" histogram 0.5% - 99.5%"; "Type: "+title_class+", #voronoi cells: "+length(marea_range)})
     
     if saveImage
         saveas(f, saveImageFolder+"/"+saveImageFilename+"_"+area_or_vol+"_histo_range", "png");
@@ -264,7 +264,7 @@ if showImage || saveImage
     bar(bins, contents, 1);
     xlabel(area_or_vol+" in μm^{"+dim+"}")
     ylabel("Cumulative area of voronoi cells")
-    title({area_or_vol+" histogram 0.5% - 99.5%"; title_class})
+    title({area_or_vol+" histogram 0.5% - 99.5%"; "Type: "+title_class+", Total "+area_or_vol+": "+sprintf("%.1f", sum(marea_range))+"μm^{"+dim+"}"})
     
     if saveImage
         saveas(f, saveImageFolder+"/"+saveImageFilename+"_"+area_or_vol+"_histo_range_cum", "png");
@@ -284,7 +284,7 @@ if showImage || saveImage
         set(gca,'yscale','log')
         xlabel(area_or_vol+" in μm^{"+dim+"}")
         ylabel("Number of voronoi cells")
-        title({area_or_vol+" histogram"; title_class})
+        title({area_or_vol+" histogram"; "Type: "+title_class+", #voronoi cells: "+length(marea_range_setting)})
         ylim([1 max_cum_area/(max_area/nbins)]);
         xlim([0 max_area]);
 
@@ -302,7 +302,7 @@ if showImage || saveImage
         bar(bins, contents, 1);
         xlabel(area_or_vol+" in μm^{"+dim+"}")
         ylabel("Cumulative area of voronoi cells")
-        title({area_or_vol+" histogram"; title_class})
+        title({area_or_vol+" histogram"; "Type: "+title_class+", Total "+area_or_vol+": "+sprintf("%.1f", sum(marea_range_setting))+"μm^{"+dim+"}"})
         ylim([0 max_cum_area]);
         xlim([0 max_area]);
 
@@ -337,7 +337,7 @@ if showImage || saveImage
         zlim([zmin,zmax])
         zlabel("z in nm")
     end
-    title({"Localizations"; title_class})
+    title({"Localizations"; "Type: "+title_class})
     xlabel("x in nm")
     ylabel("y in nm")
     if saveImage
@@ -397,9 +397,9 @@ if showImage || saveImage
     end
     set(gca,'Color',"black")
     if dim == 2
-        title({"Voronoi diagram"; "Blue -> Yellow (range: 0.5% - 99.5%)"; title_class})
+        title({"Voronoi diagram"; "Blue -> Yellow (range: 0.5% - 99.5%)";  "Type: "+title_class})
     else 
-        title({"Voronoi diagram (z in ["+(z_mean-20)+","+(z_mean+20)+"])"; "Blue -> Yellow (range: 0.5% - 99.5%)"; title_class})
+        title({"Voronoi diagram (z in ["+(z_mean-20)+","+(z_mean+20)+"])"; "Blue -> Yellow (range: 0.5% - 99.5%)";  "Type: "+title_class})
     end
     xlabel("x in nm")
     ylabel("y in nm")
