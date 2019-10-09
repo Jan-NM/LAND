@@ -2,8 +2,9 @@
 %% write the result to a csv file
 
 % d = uigetdir(pwd, 'Select a folder');
-d = "/home/ole/Hiwi/Data/Mohan_raw/DC/filtered";
-out_dir = "/home/ole/Hiwi/matlab_plots/Mohan/DC";
+title_class = "DC"
+d = "/home/ole/Hiwi/Data/Mohan_raw/"+title_class+"/filtered";
+out_dir = "/home/ole/Hiwi/matlab_plots/Mohan/"+title_class;
 
 %d = "/home/ole/Hiwi/julia";
 %out_dir = "/home/ole/Hiwi/julia";
@@ -40,7 +41,7 @@ for k = 1 : length(filenames)
     
     cell = ClusterAnalysis(Orte,'001',dims);
     [smallest_vol, biggest_vol, lowest_plot_density, highest_plot_density] = ...
-        cell.voronoiCluster(0,dims,0,out_dir, folder_name+"_test_"+filename_no_ext, max_area, max_cum_area);
+        cell.voronoiCluster(0,dims,0,out_dir, folder_name+"_test_"+filename_no_ext, title_class, max_area, max_cum_area);
     fprintf(fid_out,'%s,%s,%.5f,%.5f,%.15f,%.8f\n',d, filename, ...
                     smallest_vol, biggest_vol, lowest_plot_density, highest_plot_density);
         
