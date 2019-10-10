@@ -1,4 +1,13 @@
 function [ varargout ] = voronoiCluster( obj, isRandom, dim, showImage, saveImageFolder, saveImageFilename, title_class, max_area, max_cum_area )
+function [ ys ] = hist2cumhist(vals, bins)
+    half_dist_bins = (bins(2)-bins(1))/2;
+    ys = zeros(1,length(bins));
+    for i=1:length(bins)
+        c_vals_idx = find(bins(i)-half_dist_bins <= vals & vals < bins(i)+half_dist_bins);
+        ys(i) = sum(vals(c_vals_idx));
+    end
+        
+end
 %voronoiCluster Summary of this function goes here
 %   Detailed explanation goes here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -214,8 +223,8 @@ if showImage || saveImage
         f = figure
     end
     [contents, bins] = hist(micro_area,40);
-    contents = contents.*bins;
-    bar(bins, contents, 1)
+    ys = hist2cumhist(micro_area, bins);
+    bar(bins, ys, 1)
     xlabel(area_or_vol+" in μm^{"+dim+"}")
     ylabel("Cumulative area of voronoi cells")
     title({area_or_vol+" histogram"; "Type: "+title_class+", Total "+area_or_vol+": "+sprintf("%.1f", sum(micro_area))+"μm^{"+dim+"}"})
@@ -260,8 +269,8 @@ if showImage || saveImage
         f = figure;
     end
     [contents, bins] = hist(marea_range,40);
-    contents = contents.*bins;
-    bar(bins, contents, 1);
+    ys = hist2cumhist(marea_range, bins);
+    bar(bins, ys, 1)
     xlabel(area_or_vol+" in μm^{"+dim+"}")
     ylabel("Cumulative area of voronoi cells")
     title({area_or_vol+" histogram 0.5% - 99.5%"; "Type: "+title_class+", Total "+area_or_vol+": "+sprintf("%.1f", sum(marea_range))+"μm^{"+dim+"}"})
@@ -298,8 +307,8 @@ if showImage || saveImage
             f = figure;
         end
         [contents, bins] = hist(marea_range_setting,40);
-        contents = contents.*bins;
-        bar(bins, contents, 1);
+        ys = hist2cumhist(marea_range_setting, bins);
+        bar(bins, ys, 1)
         xlabel(area_or_vol+" in μm^{"+dim+"}")
         ylabel("Cumulative area of voronoi cells")
         title({area_or_vol+" histogram"; "Type: "+title_class+", Total "+area_or_vol+": "+sprintf("%.1f", sum(marea_range_setting))+"μm^{"+dim+"}"})
