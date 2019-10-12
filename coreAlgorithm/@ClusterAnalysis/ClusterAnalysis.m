@@ -114,6 +114,8 @@ classdef ClusterAnalysis < handle
         physicalDimension
         randomPhysicalDimension
         sampleID
+        voronoi_micro_area
+        voronoi_micro_densities
     end
     
     properties (Access = private, Hidden = true)
@@ -454,7 +456,7 @@ classdef ClusterAnalysis < handle
         
         [varargout] = distanceAnalysis(obj, maxDistance, isRandom, showPlot)
         
-        [varargout] = voronoiCluster( obj, isRandom, dim, showImage, saveImageFolder, saveImageFilename, title_class, max_area, max_cum_area)
+        [varargout] = voronoiCluster( obj, isRandom, showImage, saveImageFolder, saveImageFilename, title_class, max_area, max_cum_area)
         
         [varargout] = parameterEstimation(obj, method)
         

@@ -28,7 +28,7 @@ narginchk(2, 9);
 switch parameters
     case 'default'
         imageSize = 20000; % image size in nm
-        density = 10; % density of points in 1/�m� over entire image
+        density = 100; % density of points in 1/�m� over entire image
         densityCluster = 5; % density of cluster in 1/�m� over entire image
         clusterPoints = 0.7; % fraction of points within clusters
         clusterSize = 60; % diameter of cluster in nm;

@@ -1,4 +1,4 @@
-function [ varargout ] = voronoiCluster( obj, isRandom, dim, showImage, saveImageFolder, saveImageFilename, title_class, max_area, max_cum_area )
+function [ varargout ] = voronoiCluster( obj, isRandom, showImage, saveImageFolder, saveImageFilename, title_class, max_area, max_cum_area )
 function [ ys ] = hist2cumhist(vals, bins)
     half_dist_bins = (bins(2)-bins(1))/2;
     ys = zeros(1,length(bins));
@@ -15,7 +15,6 @@ switch nargin
     
     case 1
         isRandom = 0;
-        dim = 2;
         showImage = 0;
         saveImageFolder = "";
         saveImageFilename = "";
@@ -23,7 +22,6 @@ switch nargin
         max_area = 0;
         max_cum_area = 0;
     case 2
-        dim = 2;
         showImage = 0;
         saveImageFolder = "";
         saveImageFilename = "";
@@ -31,33 +29,26 @@ switch nargin
         max_area = 0;
         max_cum_area = 0;
     case 3
-        showImage = 0;
         saveImageFolder = "";
         saveImageFilename = "";
         title_class = "";
         max_area = 0;
         max_cum_area = 0;
     case 4
-        saveImageFolder = "";
         saveImageFilename = "";
         title_class = "";
         max_area = 0;
         max_cum_area = 0;
     case 5
-        saveImageFilename = "";
         title_class = "";
         max_area = 0;
         max_cum_area = 0;
     case 6
-        title_class = "";
         max_area = 0;
         max_cum_area = 0;
     case 7
-        max_area = 0;
         max_cum_area = 0;
     case 8
-        max_cum_area = 0;
-    case 9
         
     otherwise
         error('Wrong number of input arguments!')
@@ -71,6 +62,8 @@ else
     dataMat = obj.clusterStruct;
     treeData = obj.queryData;
 end
+
+dim = obj.dimension;
 
 %% Voronoi
 if dim == 2
@@ -154,6 +147,9 @@ if dim == 2
 elseif dim == 3
     micro_area = 10^(-9).*A;
 end
+
+obj.voronoi_micro_area = micro_area;
+obj.voronoi_micro_densities = micro_area;
 
 
 disp("quantile 0.5%")
@@ -368,6 +364,7 @@ if showImage || saveImage
     cmap = parula(ncolors);
     caxis([lowest_plot_density highest_plot_density]);
     for i=1:length(R)
+        
         if reasonables(i)
            cmap_row = floor(ncolors*((micro_densities(j)-lowest_plot_density)/(highest_plot_density-lowest_plot_density)))+1;
            if cmap_row >= ncolors+1
