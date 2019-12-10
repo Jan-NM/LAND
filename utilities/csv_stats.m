@@ -19,9 +19,6 @@ y_col = 4;
 z_col = 5;
 dims = 2;
 
-fid_out = fopen('file_out_DC_new.csv','w'); 
-fprintf(fid_out,'%s,%s,%s,%s,%s,%s\n', 'path', 'filename','smallest_vol','biggest_vol','0.5% quant density', '99.5% quant density');
-
 max_area = 20*10^(-3);
 max_cum_area= 50;
 for k = 1 : length(filenames)
@@ -54,4 +51,3 @@ for k = 1 : length(filenames)
         
 end
 
-fclose(fid_out);

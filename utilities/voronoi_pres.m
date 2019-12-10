@@ -1,3 +1,5 @@
+% Just some commands for visualizing several voronoi histogram in one
+
 %{
 bins = 0:0.00001:0.0002;
 h1 = histcounts(cellDC.voronoi_micro_area, bins);
