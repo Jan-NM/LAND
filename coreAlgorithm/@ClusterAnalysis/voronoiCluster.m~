@@ -33,8 +33,7 @@ end
 % Output
 %   (1) smallest area/volume in nanometer^{2,3}
 %   (2) biggest area/volume in nanometer^{2,3}
-%   (3) lowest plot density in 1/nanometer^{2,3} (0.5% outlier)
-%   (4) highest plot density in 1/nanometer^{2,3} (99.5% outlier)
+%   (2) biggest area/volume in nanometer^{2,3}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 switch nargin
     
