@@ -235,7 +235,7 @@ multiWaitbar( 'DBSCAN algorithm running...', 'Close' );
 %% visualization
 % plots all clusters, filtered clusters are considered
 if showImage == true && ~isempty(clusterAssignment)
-    figure( 'Name', num2str(obj.sampleID) );
+    fig = figure( 'Name', num2str(obj.sampleID) );
     multiWaitbar('creating DBSCAN image...', 0);
     % for 2D data overlay, create histogram binned image and overlay clustered points
     if obj.dimension == 2
@@ -290,6 +290,12 @@ if showImage == true && ~isempty(clusterAssignment)
     if obj.dimension == 3
         zlabel(['x', num2str(visPixelsize), ' nm'])
     end
+    % for interactive plotting - enter datacursor mode
+    dcm_obj = datacursormode(fig);
+    pos_list = ( (positions(:, 1:2)- min(positions(:, 1:2)))./visPixelsize );
+    posCoM_list(:, 1) = (( [dataMat(2).clusterDBSCAN.xCoM].' - min(positions(:, 1)) )./visPixelsize);
+    posCoM_list(:, 2) = (( [dataMat(2).clusterDBSCAN.yCoM].' - min(positions(:, 2)) )./visPixelsize);
+    set(dcm_obj, 'UpdateFcn', {@myupdatefcn, dataMat, clusterAssignment, pos_list, posCoM_list, obj.dimension});
     hold off
 end
 %% output
@@ -299,4 +305,50 @@ else
     obj.clusterStruct = dataMat;
 end
 multiWaitbar('CLOSEALL');
+end
+
+function txt = myupdatefcn(~, event_obj, dataMat, clusterAssignment, pos_list, posCoM_list, dim)
+% Customizes text of data tips
+pos = get(event_obj, 'Position');
+idx_1 = find( pos_list(:, 1) == pos(2));
+idx_2 = find( pos_list(:, 2) == pos(1));
+if idx_1 == idx_2
+    if clusterAssignment(idx_1) == 0
+        txt = {'Noise Point',...
+            ['xPos: ', num2str(pos(1))],...
+            ['yPos: ', num2str(pos(2))]};
+    else
+        if dim == 2
+            txt = {['nMolecules: ', num2str( dataMat(2).clusterDBSCAN(clusterAssignment(idx_1)).Molecules )],...
+                ['Diameter [nm]: ', num2str( dataMat(2).clusterDBSCAN(clusterAssignment(idx_1)).Diameter )],...
+                ['Area [µm^2]: ', num2str(dataMat(2).clusterDBSCAN(clusterAssignment(idx_1)).Area)],...
+                ['Next-Cluster-Distance [nm]: ', num2str(dataMat(2).clusterDBSCAN(clusterAssignment(idx_1)).NNCluster)],...
+                ['Cluster Density [µm^2]: ', num2str(dataMat(2).clusterDBSCAN(clusterAssignment(idx_1)).ClusterDensity)]};
+        else
+            txt = {['nMolecules: ', num2str( dataMat(2).clusterDBSCAN(clusterAssignment(idx_1)).Molecules )],...
+                ['Diameter [nm]: ', num2str( dataMat(2).clusterDBSCAN(clusterAssignment(idx_1)).Diameter )],...
+                ['Volume [µm^3]: ', num2str(dataMat(2).clusterDBSCAN(clusterAssignment(idx_1)).Volume)],...
+                ['Next-Cluster-Distance [nm]: ', num2str(dataMat(2).clusterDBSCAN(clusterAssignment(idx_1)).NNCluster)],...
+                ['Cluster Density [µm^3]: ', num2str(dataMat(2).clusterDBSCAN(clusterAssignment(idx_1)).ClusterDensity)]};
+        end
+    end
+elseif pos(2) == posCoM_list(posCoM_list(:, 1) == pos(2))
+    idx_1 = find(posCoM_list(:, 1) == pos(2));
+    if dim == 2
+        txt = {['nMolecules: ', num2str( dataMat(2).clusterDBSCAN(idx_1).Molecules )],...
+                ['Diameter [nm]: ', num2str( dataMat(2).clusterDBSCAN(idx_1).Diameter )],...
+                ['Area [µm^2]: ', num2str(dataMat(2).clusterDBSCAN(idx_1).Area)],...
+                ['Next-Cluster-Distance [nm]: ', num2str(dataMat(2).clusterDBSCAN(idx_1).NNCluster)],...
+                ['Cluster Density [µm^2]: ', num2str(dataMat(2).clusterDBSCAN(idx_1).ClusterDensity)]};
+    else
+        txt = {['nMolecules: ', num2str( dataMat(2).clusterDBSCAN(idx_1).Molecules )],...
+                ['Diameter [nm]: ', num2str( dataMat(2).clusterDBSCAN(idx_1).Diameter )],...
+                ['Volume [µm^3]: ', num2str(dataMat(2).clusterDBSCAN(idx_1).Volume)],...
+                ['Next-Cluster-Distance [nm]: ', num2str(dataMat(2).clusterDBSCAN(idx_1).NNCluster)],...
+                ['Cluster Density [µm^3]: ', num2str(dataMat(2).clusterDBSCAN(idx_1).ClusterDensity)]};
+    end
+else
+    txt = {'Undefined Error'};
+end
+
 end
