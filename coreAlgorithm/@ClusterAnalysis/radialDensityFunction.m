@@ -142,4 +142,5 @@ if isRandom == true
 else
     obj.clusterStruct = dataMat;
 end
+multiWaitbar('CLOSEALL');
 end

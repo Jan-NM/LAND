@@ -62,9 +62,9 @@ classdef ClusterAnalysis < handle
 %
 %   ripley's function - 2D + 3D
 %
-%   compaction parameter - 2D only
+%   compaction parameter - 2D
 %
-%   parameter estimation for DBSCAN
+%   parameter estimation for DBSCAN - 2D
 %
 %   plotting of data (scatterplot) - 2D + 3D
 %

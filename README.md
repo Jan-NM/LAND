@@ -47,7 +47,7 @@ The following description is for Windows machines:
 * type "*mex kdtree_ball_query.cpp*" in Matlab's command window
 * type "*mex kdtree_delete.cpp*" in Matlab's command window
 
-* to use LAND, right click on ILAND-master in Matlab's current folder panel, go to "*Add to Path*" and click on "*Selected Folders and Subfolders*"
+* to use LAND, right click on LAND-master in Matlab's current folder panel, go to "*Add to Path*" and click on "*Selected Folders and Subfolders*"
 
 LAND can be used via the command window or by opening the user interface. To open the user interface type "*startClusterAnalysis*" in the command window. Detailed instructions on how to use the software including examples can be found in the manual [LAND_manual.pdf](help/ILAND_manual.pdf).
 

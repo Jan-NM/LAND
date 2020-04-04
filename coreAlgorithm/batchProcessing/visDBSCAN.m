@@ -41,14 +41,14 @@ if Clusterparamstruct.DBSCAN.algorithm == true
             end
         end
     end
-    totalSignalsPerCluster = cell2mat(totalSignalsPerCluster.');
-    totalDiameter = cell2mat(totalDiameter.');
-    totalDensity = cell2mat(totalDensity.');
-    totalNNDistance = cell2mat(totalNNDistance.');
-    totalSignalsPerClusterRandom = cell2mat(totalSignalsPerClusterRandom.');
-    totalDiameterRandom = cell2mat(totalDiameterRandom.');
-    totalDensityRandom = cell2mat(totalDensityRandom.');
-    totalNNDistanceRandom = cell2mat(totalNNDistanceRandom.');
+    totalSignalsPerCluster = cell2mat(totalSignalsPerCluster);
+    totalDiameter = cell2mat(totalDiameter);
+    totalDensity = cell2mat(totalDensity);
+    totalNNDistance = cell2mat(totalNNDistance);
+    totalSignalsPerClusterRandom = cell2mat(totalSignalsPerClusterRandom);
+    totalDiameterRandom = cell2mat(totalDiameterRandom);
+    totalDensityRandom = cell2mat(totalDensityRandom);
+    totalNNDistanceRandom = cell2mat(totalNNDistanceRandom);
     %% plotting
     h = figure( 'Name', 'Results of Cluster Analysis by DBSCAN Algorithm' );
     % signals per cluster

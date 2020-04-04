@@ -31,6 +31,9 @@ function [] = compactionParameter(obj, varargin)
 if nargin > 2
     error('Too many input arguments!')
 end
+if obj.dimension == 3
+	error('Compaction parameter analysis is implemented for 2D data only');
+end
 optargs = {0, 15, 6, 'average', 4, 0.09, 50000, 3125, 2, false};
 if ~isempty(varargin)
     numvarargs = numel(fieldnames(varargin{1}));
