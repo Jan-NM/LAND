@@ -3,7 +3,7 @@ function [] = parameterEstimation( obj, method)
 %   Jan Neumann, 27.06.17
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if obj.dimension == 3
-	error('Compaction parameter analysis is implemented for 2D data only');
+	error('Parameter estimation for DBSCAN is implemented for 2D data only');
 end
 switch method
     case 'DBSCAN'
