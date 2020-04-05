@@ -2,6 +2,9 @@ function [] = parameterEstimation( obj, method)
 %parameterEstimation helps to estimate appropriate parameters for DBSCAN 
 %   Jan Neumann, 27.06.17
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if obj.dimension == 3
+	error('Parameter estimation for DBSCAN is implemented for 2D data only');
+end
 switch method
     case 'DBSCAN'
         figure('Name', 'DBSCAN parameter estimation');

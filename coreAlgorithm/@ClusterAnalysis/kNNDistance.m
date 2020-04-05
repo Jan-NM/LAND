@@ -122,7 +122,7 @@ end
 %% visualization
 if showPlot == true
     figure('Name', [num2str(k), '-Nearest Neighbor Distances: ',num2str(obj.sampleID)] );
-    if isDBSCAN == true
+    if isDBSCAN == true && any(clusterAssignment)
             plotCounter = 3; % check if outer or inner k-NN distances exist
             if isempty(innerNNDistance)
                 plotCounter = plotCounter - 1;
@@ -180,4 +180,5 @@ if isRandom == true
 else
     obj.clusterStruct = dataMat;
 end
+multiWaitbar('CLOSEALL');
 end

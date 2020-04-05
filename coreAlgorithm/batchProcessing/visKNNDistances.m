@@ -1,4 +1,4 @@
-function visKNN_Distances(Clusterparamstruct, clusterData)
+function visKNNDistances(Clusterparamstruct, clusterData)
 %visKNN_Distances Summary of this function goes here
 %   Detailed explanation goes here
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -83,18 +83,22 @@ if Clusterparamstruct.kNNDistance.algorithm == true
             histogram(totalInnerkNNDistance, ceil(max(totalInnerkNNDistance(:, 1))), 'Normalization', 'probability');
             hold on
             if Clusterparamstruct.compareRandomData == true && isfield(clusterData(kk).Analysis.randomClusterStruct, 'kNNDistance')
-                histogram(totalInnerkNNDistanceRandom, ceil(max(totalInnerkNNDistanceRandom(:, 1))), 'Normalization', 'probability');
+				if ~isempty(clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN)
+					histogram(totalInnerkNNDistanceRandom, ceil(max(totalInnerkNNDistanceRandom(:, 1))), 'Normalization', 'probability');
+				end
             end
             grid on;
-            title([num2str(Clusterparamstruct.kNNDistance.k) '-Nearest Neighbor Distance of points within a cluster']);
-            xlabel('distance [nm]');
-            ylabel('normalized frequency');
-            if Clusterparamstruct.compareRandomData == true && isfield(clusterData(kk).Analysis.randomClusterStruct, 'kNNDistance')
-                legend(['mean k-NN-Distance = ' num2str(mean(totalInnerkNNDistance)) ' nm \pm ' num2str(std(totalInnerkNNDistance)) ' nm'],...
-                    ['mean k-NN-Distance = ' num2str(mean(totalInnerkNNDistanceRandom)) ' nm \pm ' num2str(std(totalInnerkNNDistanceRandom)) ' nm']);
-            else
-                legend(['mean k-NN-Distance = ' num2str(mean(totalInnerkNNDistance)) ' nm \pm ' num2str(std(totalInnerkNNDistance)) ' nm']);
-            end
+			title([num2str(Clusterparamstruct.kNNDistance.k) '-Nearest Neighbor Distance of points within a cluster']);
+			xlabel('distance [nm]');
+			ylabel('normalized frequency');
+			if Clusterparamstruct.compareRandomData == true && isfield(clusterData(kk).Analysis.randomClusterStruct, 'kNNDistance')
+				if ~isempty(clusterData(kk).Analysis.randomClusterStruct(2).clusterDBSCAN)
+					legend(['mean k-NN-Distance = ' num2str(mean(totalInnerkNNDistance)) ' nm \pm ' num2str(std(totalInnerkNNDistance)) ' nm'],...
+						['mean k-NN-Distance = ' num2str(mean(totalInnerkNNDistanceRandom)) ' nm \pm ' num2str(std(totalInnerkNNDistanceRandom)) ' nm']);
+				end
+			else
+				legend(['mean k-NN-Distance = ' num2str(mean(totalInnerkNNDistance)) ' nm \pm ' num2str(std(totalInnerkNNDistance)) ' nm']);
+			end
             ax = gca;
             ax.XLim = [0 Clusterparamstruct.kNNDistance.maxDistance];
             hold off
