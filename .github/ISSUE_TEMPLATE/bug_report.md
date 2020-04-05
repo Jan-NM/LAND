@@ -25,10 +25,11 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
+**Please complete the following information:**
  - OS: [e.g. Windows, Linux, Mac]
  - Matlab version [e.g. 2017b, 2020a]
- - kdtree [e.g. yes / no]
+ - LAND version [e.g. 1.0.0]
+ - kdtree [yes / no]
 
 **Additional context**
 Add any other context about the problem here.
