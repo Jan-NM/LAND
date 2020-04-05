@@ -52,7 +52,7 @@ Input data should be in contained in a numeric nx12 `.mat` file. Each row (n) sh
 
 The remaining columns can be filled with zeros. If the data does not contain any localization precision and z-position (i.e. 2D data), these columns should be also filled with zeros.
 
-## Contribution and Support
+## Contributing and Support
 
 You are encouraged to contribute to this project. Feel free to open Issues for feature contributions or bug reports.
 
