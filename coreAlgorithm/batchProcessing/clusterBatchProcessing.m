@@ -103,7 +103,16 @@ for ii = 1:FILESmax
                 clusterData(ii).Analysis.ripley(Clusterparamstruct.ripley.radius,...
                 Clusterparamstruct.ripley.maxDistance, 1, Clusterparamstruct.showPlots);
             end
-        end
+		end
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Compaction Parameter
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		if Clusterparamstruct.ccp.algorithm == true
+            clusterData(ii).Analysis.compactionParameter(Clusterparamstruct.ccp.parameters);
+            if Clusterparamstruct.compareRandomData == true
+                warning('Random data are not supported for compaction parameter analysis.');
+            end
+		end
     catch ME
         disp(['An error occured during evaluation of file: ' sampleID'.']);
         disp(getReport(ME,'extended'));
@@ -130,11 +139,11 @@ clusterData = clusterData(keep);
 %% create results report and plots
 multiWaitbar( 'Finishing computation! Please wait a few mintues.', 'Busy');
 % Nearest Neighbor analysis
-visKNN_Distances(Clusterparamstruct, clusterData)
+visKNNDistances(Clusterparamstruct, clusterData)
 % DBSCAN algorithm
 visDBSCAN(Clusterparamstruct, clusterData)
 % distance analysis
-vis_Distances(Clusterparamstruct, clusterData)
+visDistances(Clusterparamstruct, clusterData)
 % radial density function
 visRDF(Clusterparamstruct, clusterData)
 % Ripley's function

@@ -62,7 +62,9 @@ classdef ClusterAnalysis < handle
 %
 %   ripley's function - 2D + 3D
 %
-%   parameter estimation for DBSCAN
+%   compaction parameter - 2D
+%
+%   parameter estimation for DBSCAN - 2D
 %
 %   plotting of data (scatterplot) - 2D + 3D
 %
@@ -456,7 +458,7 @@ classdef ClusterAnalysis < handle
         
         [varargout] = distanceAnalysis(obj, maxDistance, isRandom, showPlot)
         
-        [varargout] = voronoiCluster( obj, isRandom, showImage, saveImageFolder, saveImageFilename, title_class, max_area, max_cum_area)
+        [varargout] = compactionParameter(obj, varargin)
         
         [varargout] = parameterEstimation(obj, method)
         

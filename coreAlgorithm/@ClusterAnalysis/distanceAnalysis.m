@@ -106,7 +106,7 @@ end
 %% visualization
 if showPlot == true
     figure( 'Name', num2str(obj.sampleID) );
-    if isDBSCAN == true
+    if isDBSCAN == true && any(clusterAssignment)
         subplot(1, 3, 1)
         h = histogram(distances, ceil(max(distances(:, 1))), 'Normalization', 'probability');
         grid on;
@@ -152,6 +152,7 @@ if isRandom == true
 else
     obj.clusterStruct = dataMat;
 end
+multiWaitbar('CLOSEALL');
 end
 
 

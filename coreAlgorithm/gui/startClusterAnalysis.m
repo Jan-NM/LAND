@@ -4,7 +4,7 @@ function varargout = startClusterAnalysis(varargin)
 %   
 % Cremer Group, Institute of Molecular Biology (IMB), Mainz
 
-% Last Modified by GUIDE v2.5 30-Apr-2019 11:27:15
+% Last Modified by GUIDE v2.5 04-Apr-2020 16:40:06
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -282,6 +282,24 @@ Clusterparamstruct.RDF.maxDistance = str2double(get(handles.maxDistRDF, 'String'
 Clusterparamstruct.ripley.algorithm = get(handles.ripley, 'Value');
 Clusterparamstruct.ripley.radius = str2double(get(handles.ripleyRadius, 'String')); % in nm
 Clusterparamstruct.ripley.maxDistance = str2double(get(handles.ripleyDistance, 'String')); % in nm
+
+% parameter for chromatin compaction analysis
+Clusterparamstruct.ccp.algorithm = get(handles.ccp, 'Value');
+if Clusterparamstruct.showPlots == true
+	plotOverlay = true;
+else 
+	plotOverlay = true;
+end
+Clusterparamstruct.ccp.parameters = struct('isRandom', 0,...
+										   'binSize', 15,...
+										   'nFilters', 6,...
+										   'filterType', 'average',...
+										   'PixRedFactor', 4,...
+										   'SobelThresh', 0.09,...
+										   'maxExternalObject', 50000,...
+										   'maxExternalObjectReduced', 3125,...
+										   'nPerimeter', 2,...
+										   'plotOverlay', plotOverlay);
 
 % get name of sample
 if isempty(get(handles.treatmentName, 'String'))
@@ -962,3 +980,12 @@ function gridSpacing_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in ccp.
+function ccp_Callback(hObject, eventdata, handles)
+% hObject    handle to ccp (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of ccp

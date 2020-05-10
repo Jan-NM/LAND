@@ -19,7 +19,7 @@ void retrieve_data( const mxArray* matptr, vector< vector<double> >& dataV, int&
         if( mxIsNaN( data[i] ) ) mexErrMsgTxt("input data contains NAN values.");
         if( mxIsInf( data[i] ) ) mexErrMsgTxt("input data contains INF values!");
     }
-    
+
     // FILL THE DATA STRUCTURES
 	dataV.resize(npoints, vector<double>(ndims));
 	for( int i=0; i<npoints; i++ )
