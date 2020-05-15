@@ -24,7 +24,7 @@ At least 8 GByte RAM are recommended.
 
 ### Installation
 
-* download the software package from https://github.com/Jan-NM/LAND
+* download the software package from https://github.com/Jan-NM/LAND/releases
 * extract `LAND-master.zip`
 * copy the generated `LAND-master` directory into your local MATLAB working directory
 * to use LAND, right click on `LAND-master` in MATLAB's current folder panel, go to `Add to Path` and click on `Selected Folders and Subfolders`
