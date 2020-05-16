@@ -12,13 +12,13 @@ function [] = voronoiCluster( obj, varargin )
 %							clustering plot, where intensity scales from
 %							lowestVoronoiCellDensity to highestVoronoiCellDensity
 %					lowestVoronoiCellDensity (default: 0.005 quantile):
-%							lowest voronoi cell density to plot, values
-%							lower than the given value are assigned to that
-%							value
+%							cumulative probability of lowest voronoi cell 
+%							density to plot, values lower than the given value
+%							are assigned to that value
 %					highestVoronoiCellDensity (default: 0.995 quantile):
-%							highest voronoi cell density to plot, values
-%							higher than the given value are assigned to that
-%							value
+%							cumulative probability of highest voronoi cell
+%							density to plot, values	higher than the given
+%							value are assigned to that value
 %
 % example for usage (will use default values for lowestVoronoiCellDensity 
 % and highestVoronoiCellDensity):
@@ -30,7 +30,7 @@ function [] = voronoiCluster( obj, varargin )
 % Output
 %   (1) Voronoi vertices
 %   (2) Voronoi regions (as indices of corresponding vertices in (1) )
-%   (3) Voronoi areas (2D: µm^2) / volume (3D: µm^3)
+%   (3) Voronoi area (2D: µm^2) / volume (3D: µm^3)
 %   (4) Voronoi density (2D: 1/µm^2) or (3D: 1/µm^3)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% init
@@ -41,7 +41,7 @@ if obj.dimension == 3
 	error('Evaluetion of voronoi cells is not yet fully supported for 3D images!');
 end
 % voronoi cell density will be set later on to the default values
-optargs = {false, false, 1, 10000};
+optargs = {false, false, 0.005, 0.995};
 if ~isempty(varargin)
     numvarargs = numel(fieldnames(varargin{1}));
     fields = fieldnames(varargin{1});
@@ -117,17 +117,9 @@ if dim == 2
 	micro_area = 10^(-6).*voronoi_region_size;
 end
 %% plotting
-% set quantile densities again
-optargs = {false, false, quantile(micro_densities, 0.005), quantile(micro_densities, 0.995)};
-if ~isempty(varargin)
-    numvarargs = numel(fieldnames(varargin{1}));
-    fields = fieldnames(varargin{1});
-    for ii = 1:numvarargs
-        optargs{ii} = varargin{1}.(fields{ii});
-    end
-end
-[isRandom, showImage, lowestVoronoiCellDensity,...
-	highestVoronoiCellDensity] = optargs{:};
+% set quantile densities to corresponding densities in 1/µm^2
+lowestVoronoiCellDensity = quantile(micro_densities, lowestVoronoiCellDensity);
+highestVoronoiCellDensity = quantile(micro_densities, highestVoronoiCellDensity);
 
 % works only for 2D
 if showImage == true

@@ -307,8 +307,9 @@ if Clusterparamstruct.showPlots == true
 else
 	showPlot = false;
 end
-Clusterparamstruct.voronoi.minVoronoiCellDensity = str2double(get(handles.minVoronoiCellDensity, 'String')); % in µm^2
-Clusterparamstruct.voronoi.maxVoronoiCellDensity = str2double(get(handles.maxVoronoiCellDensity, 'String')); % in µm^2
+% cumulativ probabilities (values should be between 0 and 1)
+Clusterparamstruct.voronoi.minVoronoiCellDensity = str2double(get(handles.minVoronoiCellDensity, 'String'));
+Clusterparamstruct.voronoi.maxVoronoiCellDensity = str2double(get(handles.maxVoronoiCellDensity, 'String'));
 % set dummy variables for isRandom and VoronoiCellDensity - these values
 % will be adjusted later on accordingly
 Clusterparamstruct.voronoi.parameters = struct( 'isRandom', Clusterparamstruct.compareRandomData,...
