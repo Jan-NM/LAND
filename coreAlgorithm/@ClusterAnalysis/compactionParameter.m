@@ -51,6 +51,7 @@ else
     positions = obj.positionTable;
     dataMat = obj.clusterStruct;
 end
+multiWaitbar('Calculating CCP. Please wait!', 'busy');
 %% extract positions and bin image
 binnedImage = im2uint16(visModuleCluster(positions, 'histogramBinning', binSize));
 %% extract nucleus to background-free image
@@ -111,6 +112,7 @@ if isRandom == true
 else
     obj.clusterStruct = dataMat;
 end
+multiWaitbar('CLOSEALL');
 end
 
 

@@ -4,7 +4,7 @@ function varargout = startClusterAnalysis(varargin)
 %   
 % Cremer Group, Institute of Molecular Biology (IMB), Mainz
 
-% Last Modified by GUIDE v2.5 04-Apr-2020 16:40:06
+% Last Modified by GUIDE v2.5 15-May-2020 23:45:01
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -288,7 +288,7 @@ Clusterparamstruct.ccp.algorithm = get(handles.ccp, 'Value');
 if Clusterparamstruct.showPlots == true
 	plotOverlay = true;
 else 
-	plotOverlay = true;
+	plotOverlay = false;
 end
 Clusterparamstruct.ccp.parameters = struct('isRandom', 0,...
 										   'binSize', 15,...
@@ -300,7 +300,22 @@ Clusterparamstruct.ccp.parameters = struct('isRandom', 0,...
 										   'maxExternalObjectReduced', 3125,...
 										   'nPerimeter', 2,...
 										   'plotOverlay', plotOverlay);
-
+% parameter for voronoi analysis
+Clusterparamstruct.voronoi.algorithm = get(handles.voronoi, 'Value');
+if Clusterparamstruct.showPlots == true
+	showPlot = true;
+else
+	showPlot = false;
+end
+% cumulativ probabilities (values should be between 0 and 1)
+Clusterparamstruct.voronoi.minVoronoiCellDensity = str2double(get(handles.minVoronoiCellDensity, 'String'));
+Clusterparamstruct.voronoi.maxVoronoiCellDensity = str2double(get(handles.maxVoronoiCellDensity, 'String'));
+% set dummy variables for isRandom and VoronoiCellDensity - these values
+% will be adjusted later on accordingly
+Clusterparamstruct.voronoi.parameters = struct( 'isRandom', Clusterparamstruct.compareRandomData,...
+												'showImage', showPlot,...
+												'lowestVoronoiCellDensity', Clusterparamstruct.voronoi.minVoronoiCellDensity,...
+												'highestVoronoiCellDensity', Clusterparamstruct.voronoi.maxVoronoiCellDensity);
 % get name of sample
 if isempty(get(handles.treatmentName, 'String'))
     Clusterparamstruct.treatmentName = 'clusterData';
@@ -989,3 +1004,58 @@ function ccp_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of ccp
+
+
+
+function minVoronoiCellDensity_Callback(hObject, eventdata, handles)
+% hObject    handle to minVoronoiCellDensity (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of minVoronoiCellDensity as text
+%        str2double(get(hObject,'String')) returns contents of minVoronoiCellDensity as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function minVoronoiCellDensity_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to minVoronoiCellDensity (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function maxVoronoiCellDensity_Callback(hObject, eventdata, handles)
+% hObject    handle to maxVoronoiCellDensity (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of maxVoronoiCellDensity as text
+%        str2double(get(hObject,'String')) returns contents of maxVoronoiCellDensity as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function maxVoronoiCellDensity_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to maxVoronoiCellDensity (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in voronoi.
+function voronoi_Callback(hObject, eventdata, handles)
+% hObject    handle to voronoi (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of voronoi

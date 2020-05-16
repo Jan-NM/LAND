@@ -54,6 +54,8 @@ classdef ClusterAnalysis < handle
 %   DBSCAN (A Density-Based Algorithm for Discovering Clusters in Large
 %   Spatial Databases with Noise. Ester at al. 1996) - 2D + 3D
 %
+%	Voronoi - 2D
+%
 %   k-nearest neighbor distance - 2D + 3D
 %
 %   distance analysis - 2D + 3D
@@ -455,6 +457,8 @@ classdef ClusterAnalysis < handle
         [varargout] = ripley(obj, samplingDistance,  maxRadius, isRandom, showImage)
         
         [varargout] = distanceAnalysis(obj, maxDistance, isRandom, showPlot)
+		
+		[ varargout ] = voronoiCluster( obj, varargin )
         
         [varargout] = compactionParameter(obj, varargin)
         

@@ -113,6 +113,17 @@ for ii = 1:FILESmax
                 warning('Random data are not supported for compaction parameter analysis.');
             end
 		end
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % Voronoi
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		if Clusterparamstruct.voronoi.algorithm == true
+			Clusterparamstruct.voronoi.parameters.isRandom = false;
+            clusterData(ii).Analysis.voronoiCluster(Clusterparamstruct.voronoi.parameters);
+            if Clusterparamstruct.compareRandomData == true
+				Clusterparamstruct.voronoi.parameters.isRandom = true;
+                clusterData(ii).Analysis.voronoiCluster(Clusterparamstruct.voronoi.parameters);
+            end
+		end
     catch ME
         disp(['An error occured during evaluation of file: ' sampleID'.']);
         disp(getReport(ME,'extended'));
