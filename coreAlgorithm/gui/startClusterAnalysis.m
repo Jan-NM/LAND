@@ -69,6 +69,9 @@ global files;
 DIR_input = pwd;
 DIR_output = [pwd filesep 'out'];
 
+% set settings directory
+DIR_settings = [pwd filesep 'settings'];
+
 files ={};
 set(handles.displayDIR_input,'String',DIR_input);
 set(handles.displayDIR_output,'String',DIR_output);

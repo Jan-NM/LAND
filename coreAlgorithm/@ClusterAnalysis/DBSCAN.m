@@ -257,7 +257,7 @@ if showImage == true && any(clusterAssignment)
 		ylabel(hbar, 'intensity [arb. unit]')
 		axis image
 		xlabel(ax1, ['x', num2str(visPixelsize), ' nm'])
-		ylabel(ax1, ['x', num2str(visPixelsize), ' nm'])
+		ylabel(ax1, ['y', num2str(visPixelsize), ' nm'])
 		title('Gaussian blurred image')
 		subplot(1, 2, 2);
 	end
@@ -319,9 +319,9 @@ if showImage == true && any(clusterAssignment)
 	xlim([min(positions(:, 2))./visPixelsize, max(positions(:, 2))./visPixelsize]); 
 	ylim([min(positions(:, 1))./visPixelsize, max(positions(:, 1))./visPixelsize]);
 	xlabel(['x', num2str(visPixelsize), ' nm'])
-	ylabel(['x', num2str(visPixelsize), ' nm'])
+	ylabel(['y', num2str(visPixelsize), ' nm'])
 	if obj.dimension == 3
-		zlabel(['x', num2str(visPixelsize), ' nm'])
+		zlabel(['z', num2str(visPixelsize), ' nm'])
 	end
 	hold off
 	set(fig, 'Visible', 'on');

@@ -63,9 +63,9 @@ dim = obj.dimension;
 multiWaitbar('Calculating Voronoi cells. Please wait!', 'busy');
 %% Calculate voronoi vertices and regions via delaunay triangulation
 if dim == 2
-	dt = delaunayTriangulation( positions(:,1), positions(:,2) );
+	dt = delaunayTriangulation( positions(:, 2), positions(:, 1) );
 elseif dim == 3
-	dt = delaunayTriangulation( positions(:,1) , positions(:,2), positions(:,3));
+	dt = delaunayTriangulation( positions(:, 2) , positions(:, 1), positions(:, 3));
 else
 	error("Error in voronoi calculation: Function supports only 2D or 3D data!")
 end
@@ -74,10 +74,10 @@ end
 [V, R] = voronoiDiagram(dt);
 %% calculate voronoi areas / volumes
 % filter regions that are not valid
-xmin = min(positions(:, 1));
-xmax = obj.physicalDimension(1);
-ymin = min(positions(:, 2));
-ymax = obj.physicalDimension(2);
+xmin = min(positions(:, 2));
+xmax = obj.physicalDimension(2);
+ymin = min(positions(:, 1));
+ymax = obj.physicalDimension(1);
 if dim == 3
 	zmin = min(positions(:, 3));
 	zmax = obj.physicalDimension(3);
@@ -174,6 +174,8 @@ if showImage == true
 	% set figure
 	h = figure('Name', 'Voronoi diagram', 'Visible', 'off');
 	ax = axes(h, 'Color', cmap(1, :) );
+	% reverse axis to be aligned with original image
+	ax.YDir = 'reverse';
 	axis equal
 	ax.XLim = [xmin xmax];
 	ax.YLim = [ymin ymax];
