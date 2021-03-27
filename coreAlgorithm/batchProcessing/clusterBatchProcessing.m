@@ -148,7 +148,7 @@ if isempty(keep)
 end
 clusterData = clusterData(keep);
 %% create results report and plots
-multiWaitbar( 'Finishing computation! Please wait a few mintues.', 'Busy');
+multiWaitbar( 'Finishing computation! Please wait a few minutes.', 'Busy');
 % Nearest Neighbor analysis
 visKNNDistances(Clusterparamstruct, clusterData)
 % DBSCAN algorithm

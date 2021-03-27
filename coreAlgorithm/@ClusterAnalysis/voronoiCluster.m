@@ -6,12 +6,18 @@ function [] = voronoiCluster( obj, varargin )
 %
 % Input:
 %   obj:		 The cell object (given by cell.voronoiCluster)
-%	varargin     struct containing the following fields in the same order:
+%	varargin     struct containing the following fields in the same sequence:
 %                   isRandom (default: false):
 %							true = use random data; false = use experimental data
 %                   showImage (default: false):
 %							true = shows Voronoi clustering plot, where intensity scales from
-%							lowestVoronoiCellDensity to highestVoronoiCellDensity
+%							lowestVoronoiCellDensity to
+%							highestVoronoiCellDensity i.e. regions lower
+%							than the lowestVoronoiCellDensity are assigned to
+%							the lowest intensity within the colormap and
+%							regions higher than the highestVoronoiCellDensity
+%							are assigned to	the highest intensity within
+%							the colormap
 %					lowestVoronoiCellDensity (default: 0.005 quantile):
 %							cumulative probability of lowest voronoi cell
 %							density to plot, values lower than the given value
@@ -30,9 +36,18 @@ function [] = voronoiCluster( obj, varargin )
 %
 % Output
 %   (1) Voronoi vertices
-%   (2) Voronoi regions (as indices of corresponding vertices in (1) )
-%   (3) Voronoi area (2D: µm^2) / volume (3D: µm^3)
-%   (4) Voronoi density (2D: 1/µm^2) or (3D: 1/µm^3)
+%	(2) Voronoi regions (without any filtering)
+%	(3) Voronoi filter (Logical Array, true elements correspond to Voronoi 
+%						regions in (2), where all vertices are inside the
+%						image border)
+%   (4) Voronoi regions (as indices of corresponding vertices in (1),
+%					     regions that contain vertices outside of the image
+%   					 have been filtered out)
+%   (5) Voronoi area (2D: µm^2) / volume (3D: µm^3) of regions in (4)
+%   (6) Voronoi density (2D: 1/µm^2) or (3D: 1/µm^3) of regions in (4)
+%
+%	TODO: work with same unit i.e. add standardized unit converter,
+%		  convert input / output of units to internal format
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% init
 if nargin > 2
@@ -102,27 +117,25 @@ for iRegion = 1:numel(voronoiRegions)
 end
 
 % keep Voronoi regions inside the boundaries
-voronoiRegions = voronoiRegions(regionsInsideBoundary);
+voronoiRegionsFiltered = voronoiRegions(regionsInsideBoundary);
 
 % calculate size (area / volume ) of voronoi regions
 voronoiRegionsSize = NaN( nnz(regionsInsideBoundary), 1 );
-for iRegion = 1:numel(voronoiRegions)
-	[~, regionSize] = convhull( vertices(voronoiRegions{iRegion}, : ) );
+for iRegion = 1:numel(voronoiRegionsFiltered)
+	[~, regionSize] = convhull( vertices(voronoiRegionsFiltered{iRegion}, : ) );
 	if isnan(regionSize) == false && isinf(regionSize) == false
 		voronoiRegionsSize(iRegion) = regionSize; % in nm^2 / nm^3
 	end
 end
 
-% TODO work with same unit i.e. add standardized unit converter,
-% convert input / output of units to internal format
 if dim == 2
 	voronoiRegionsDensity = 10^6.* ( 1./voronoiRegionsSize ); % in µm^2
 else
 	voronoiRegionsDensity = 10^9.* ( 1./voronoiRegionsSize ); % in µm^3
 end
 %% plotting
-if obj.dimension == 3
-	warning('Plotting of Voronoi cells is supported for 2D images only!');
+if obj.dimension == 3 && showImage == true
+	warning('Plotting of Voronoi cells is only supported for 2D images!');
 end
 % set quantile densities to corresponding densities in 1/µm^2
 lowestVoronoiCellDensity = quantile(voronoiRegionsDensity, lowestVoronoiCellDensity);
@@ -133,15 +146,20 @@ if showImage == true && obj.dimension == 2
 	% set color scheme
 	nColors = 256;
 	colorMap = turbo(nColors);
-	
+	% subtract two colors, since these are used for regions that have
+	% density lower or higher than the lowestVoronoiCellDensity or highestVoronoiCellDensity
+	nMinToMaxColors = nColors - 2;
 	% find all Voronoi regions that fit into same row of the color map
-	voronoiDensityMappedToColorMap = linspace(lowestVoronoiCellDensity, highestVoronoiCellDensity, nColors);
+	% map densities to colormap, add +1 since linspace outputs the edges of
+	% the bins and not the number of bins -> number of density bins should
+	% corrspond to the number of colors
+	voronoiDensityMappedToColorMap = linspace(lowestVoronoiCellDensity, highestVoronoiCellDensity, nMinToMaxColors + 1);
 	nDensityBins = numel(voronoiDensityMappedToColorMap) - 1;
 	% add two additional for cells that are below or above of
 	% lowestVoronoiCellDensity or highestVoronoiCellDensity
 	regionsMappedToVoronoiDensity = cell( nDensityBins + 2, 1 );
 	for iDensityBin = 1:nDensityBins
-		mappedRegions = voronoiRegions( voronoiRegionsDensity(:) >= voronoiDensityMappedToColorMap(iDensityBin) &...
+		mappedRegions = voronoiRegionsFiltered( voronoiRegionsDensity(:) >= voronoiDensityMappedToColorMap(iDensityBin) &...
 										voronoiRegionsDensity(:) < voronoiDensityMappedToColorMap( iDensityBin + 1 ) );
 		% To plot the Voronoi regions, all regions contained in the mapped
 		% cell array must be collected in an conventional array first, where
@@ -162,7 +180,7 @@ if showImage == true && obj.dimension == 2
 		regionsMappedToVoronoiDensity{iDensityBin} =  tempIndiceArray;
 	end
 	% handle Voronoi cells smaller than the lowestVoronoiCellDensity
-	mappedRegions = voronoiRegions( voronoiRegionsDensity(:) < voronoiDensityMappedToColorMap(1) );
+	mappedRegions = voronoiRegionsFiltered( voronoiRegionsDensity(:) < voronoiDensityMappedToColorMap(1) );
 	maxNumIndices = max( cellfun('size', mappedRegions, 2) );
 	tempIndiceArray = NaN( size(mappedRegions, 1), maxNumIndices );
 	for iMappedRegion = 1:size(mappedRegions, 1)
@@ -172,7 +190,7 @@ if showImage == true && obj.dimension == 2
 	end
 	regionsMappedToVoronoiDensity{nDensityBins + 1} =  tempIndiceArray;
 	% handle Voronoi cells larger than the highestVoronoiCellDensity
-	mappedRegions = voronoiRegions( voronoiRegionsDensity(:) >= voronoiDensityMappedToColorMap(nDensityBins + 1) );
+	mappedRegions = voronoiRegionsFiltered( voronoiRegionsDensity(:) >= voronoiDensityMappedToColorMap(end) );
 	maxNumIndices = max( cellfun('size', mappedRegions, 2) );
 	tempIndiceArray = NaN( size(mappedRegions, 1), maxNumIndices );
 	for iMappedRegion = 1:size(mappedRegions, 1)
@@ -182,9 +200,16 @@ if showImage == true && obj.dimension == 2
 	end
 	regionsMappedToVoronoiDensity{nDensityBins + 2} =  tempIndiceArray;
 	
-	% set figure
-	h = figure('Name', 'Voronoi diagram', 'Visible', 'off');
-	ax = axes(h, 'Color', colorMap(1, :) );
+	% create main figure
+	figName = ['Voronoi diagram - ' num2str(obj.sampleID)];
+	if isRandom == true
+		figName = [figName ' - random data'];
+	end
+	h1 = figure('Name', figName, 'Visible', 'off');	
+	% set background color of plot => removed Voronoi regions will be
+	% plotted with the same color as regions with the lowest Voronoi cell
+	% density
+	ax = axes(h1, 'Color', colorMap(1, :) );
 	% reverse axis to be aligned with original image
 	ax.YDir = 'reverse';
 	axis equal
@@ -194,36 +219,40 @@ if showImage == true && obj.dimension == 2
 	ax.YLabel.String = 'y in nm';
 	ax.CLimMode = 'manual';
 	ax.CLim = [lowestVoronoiCellDensity highestVoronoiCellDensity];
+	colormap(ax, colorMap);
 	c = colorbar(ax);
 	c.Label.String = "Density in μm^{-"+dim+"}";
+	c.LimitsMode = 'manual';
 	c.Limits = [lowestVoronoiCellDensity highestVoronoiCellDensity];
 	hold on
-	for iRegion=1:nDensityBins
-		ntempColors = repmat(colorMap(iRegion, :), size(regionsMappedToVoronoiDensity{iRegion}, 1), 1);
-		patch(ax, 'Faces', regionsMappedToVoronoiDensity{iRegion}, 'Vertices', vertices, 'FaceVertexCData', ntempColors,...
-			'EdgeColor','none','FaceColor', colorMap(iRegion, :));
+	for iDensityBin=2:nDensityBins+1
+		ntempColors = repmat(colorMap(iDensityBin, :), size(regionsMappedToVoronoiDensity{iDensityBin-1}, 1), 1);
+		patch(ax, 'Faces', regionsMappedToVoronoiDensity{iDensityBin-1}, 'Vertices', vertices, 'FaceVertexCData', ntempColors,...
+			'EdgeColor', 'none', 'FaceColor', colorMap(iDensityBin, :));
 	end
 	% handle voronoi cells smaller than lowestVoronoiCellDensity
 	ntempColors = repmat(colorMap(1, :), size(regionsMappedToVoronoiDensity{nDensityBins + 1}, 1), 1);
 	patch(ax, 'Faces', regionsMappedToVoronoiDensity{nDensityBins + 1}, 'Vertices', vertices, 'FaceVertexCData', ntempColors,...
-		'EdgeColor','none','FaceColor', colorMap(1, :));
-	% handle voronoi cells smaller than highestVoronoiCellDensity
-	ntempColors = repmat(colorMap(nDensityBins, :), size(regionsMappedToVoronoiDensity{nDensityBins + 2}, 1), 1);
+		'EdgeColor', 'none', 'FaceColor', colorMap(1, :));
+	% handle voronoi cells higher than highestVoronoiCellDensity
+	ntempColors = repmat(colorMap(nColors, :), size(regionsMappedToVoronoiDensity{nDensityBins + 2}, 1), 1);
 	patch(ax, 'Faces', regionsMappedToVoronoiDensity{nDensityBins + 2}, 'Vertices', vertices, 'FaceVertexCData', ntempColors,...
-		'EdgeColor','none','FaceColor', colorMap(nDensityBins, :));
+		'EdgeColor', 'none', 'FaceColor', colorMap(nColors, :));
 	hold off
-	h.Visible = 'on';
+	h1.Visible = 'on';	
 end
 %% output
-dataMat(1).voronoiVertices = vertices;
-dataMat(2).voronoiRegions = voronoiRegions;
+dataMat(1).voronoi = vertices;
+dataMat(2).voronoi = voronoiRegions;
+dataMat(3).voronoi = regionsInsideBoundary;
+dataMat(4).voronoi = voronoiRegionsFiltered;
 
 if obj.dimension == 2
-	dataMat(3).voronoiArea = 10^(-6).*voronoiRegionsSize; % area in µm^2
-	dataMat(4).voronoiDensity = 10^6.* ( 1./voronoiRegionsSize ); % density in µm^2
+	dataMat(5).voronoi = 10^(-6).*voronoiRegionsSize; % area in µm^2
+	dataMat(6).voronoi = 10^6.* ( 1./voronoiRegionsSize ); % density in µm^2
 else
-	dataMat(3).voronoiVolume = 10^(-9).*voronoiRegionsSize; % volume in µm^3
-	dataMat(4).voronoiDensity = 10^9.* ( 1./voronoiRegionsSize ); % density in µm^3
+	dataMat(5).voronoi = 10^(-9).*voronoiRegionsSize; % volume in µm^3
+	dataMat(6).voronoi = 10^9.* ( 1./voronoiRegionsSize ); % density in µm^3
 end
 if isRandom == true
 	obj.randomClusterStruct = dataMat;
