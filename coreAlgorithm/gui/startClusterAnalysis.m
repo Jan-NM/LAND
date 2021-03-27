@@ -69,6 +69,9 @@ global files;
 DIR_input = pwd;
 DIR_output = [pwd filesep 'out'];
 
+% set settings directory
+DIR_settings = [pwd filesep 'settings'];
+
 files ={};
 set(handles.displayDIR_input,'String',DIR_input);
 set(handles.displayDIR_output,'String',DIR_output);
@@ -510,7 +513,7 @@ function helpbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to helpbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-winopen('help/LAND_manual.pdf');
+web('https://github.com/Jan-NM/LAND');
 
 
 % --- Executes on button press in twoDim.
