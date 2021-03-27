@@ -1,13 +1,29 @@
 # Localization Analyzer for Nanoscale Distributions (LAND)
 
-[![GitHub tag (latest SemVer)] (https://github.com/Jan-NM/LAND/releases)](https://img.shields.io/github/v/tag/Jan-NM/LAND?sort=semver)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/Jan-Nm/LAND?logo=GitHub)
 ![GitHub](https://img.shields.io/github/license/Jan-NM/LAND)
 
-LAND is a software package written in MATLAB that enables quantitative 2D and 3D analysis of single molecule localization microscopy (SMLM) data. The package includes density-based clustering algorithms like DBSCAN and algorithms used in spatial statistics like the radial density function or Ripley's function. In addition, it contains algorithms for quantifying the conformation and texture of the nuclear nanostructure. LAND has been specifically designed for the evaluation of large sample sizes and data with high emitter densities.
+LAND is a software package for quantitative analysis of single molecule localization microscopy (SMLM) data. It has been specifically designed for the evaluation of large sample sizes and data with high emitter densities.
+
+- Analysis of 2D and 3D SMLM data
+- Algorithms: 
+  - Density-Based Spatial Clustering of Applications with Noise (DBSCAN)
+  - Voronoi-based cluster analysis
+  - Ripley's function
+  - Radial Distribution Function (RDF)
+  - Nearest Neighbor analysis (NN) 
+  - Distance analysis
+- Algorithms for quantifying the conformation and texture of the nuclear nanostructure (SMLM-ConText)
+- Visualization of data
+- User Interface with batch processing capabilities
+
+## Documentation
+
+Detailed instructions on how to use the software including examples can be found in the [wiki](https://github.com/Jan-NM/LAND/wiki).
 
 ## Getting Started
 
-The follwong sections describe how to get a copy of the software and how to install it on your local machine. Detailed instructions on how to use the software including examples can be found in the [manual](help/LAND_manual.pdf).
+The follwong sections describe how to get a copy of the software and how to install it on your local machine. Detailed instructions on how to use the software including examples can be found in the [wiki](https://github.com/Jan-NM/LAND/wiki).
 
 ### Requirements
 
@@ -29,7 +45,7 @@ At least 8 GByte RAM are recommended.
 * copy the generated `LAND-master` directory into your local MATLAB working directory
 * to use LAND, right click on `LAND-master` in MATLAB's current folder panel, go to `Add to Path` and click on `Selected Folders and Subfolders`
 
-LAND can be used via the command window or by opening a user interface. To open the user interface type `startClusterAnalysis` in the command window. Detailed instructions on how to use the software including examples can be found in the [manual](help/LAND_manual.pdf).
+LAND can be used via the command window or by opening a user interface. To open the user interface type `startClusterAnalysis` in the command window. Detailed instructions on how to use the software including examples can be found in the [wiki](https://github.com/Jan-NM/LAND/wiki).
 
 **Recommended Installation: ataiya/kdtree**
 
@@ -52,9 +68,9 @@ Input data should be in contained in a numeric nx12 `.mat` file. Each row (n) sh
 
 The remaining columns can be filled with zeros. If the data does not contain any localization precision and z-position (i.e. 2D data), these columns should be also filled with zeros.
 
-## Contributing and Support
+## Contributing, Bug Reports and Feature Requests
 
-You are encouraged to contribute to this project. Feel free to open Issues for feature contributions or bug reports.
+You are encouraged to contribute to this project. Please use the [issue tracker on GitHub](https://github.com/Jan-NM/LAND/issues) to report bugs or to open feature requests.
 
 ## License
 
